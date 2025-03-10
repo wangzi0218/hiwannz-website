@@ -1,0 +1,268 @@
+---
+import '../styles/globals.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+// 导入翻译文件
+import { translations } from '../i18n/translations';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  chineseTitle?: string;
+  chineseDescription?: string;
+}
+
+const { 
+  title = "Wannz | Product Designer & Developer",
+  description = "Wannz is a product designer and developer specializing in creating intuitive and beautiful digital experiences.",
+  image = "/images/og-image.jpg" 
+} = Astro.props;
+
+// 计算规范化URL
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// 将翻译内容传递给客户端
+const serializedTranslations = JSON.stringify(translations);
+---
+
+<!DOCTYPE html>
+<html lang="en" data-current-lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- SEO -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    
+    <!-- 语言元数据 -->
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang="en" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="alternate" hreflang="zh" href={new URL(`${Astro.url.pathname}?lang=zh`, Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="canonical" href={canonicalURL} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(image, Astro.site)} />
+    
+    <!-- 字体预加载 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="min-h-screen flex flex-col antialiased">
+    <Navbar />
+    <main class="flex-grow">
+      <slot />
+    </main>
+    <Footer />
+    
+    <!-- 滚动平滑效果 -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+              targetElement.scrollIntoView({
+                behavior: 'smooth'
+              });
+              
+              // 更新 URL 但不刷新页面
+              history.pushState(null, '', targetId);
+            }
+          });
+        });
+      });
+    </script>
+    
+    <!-- 国际化脚本 -->
+    <script is:inline define:vars={{ serializedTranslations }}>
+      // 定义支持的语言
+      const SUPPORTED_LANGUAGES = ['en', 'zh'];
+      const DEFAULT_LANGUAGE = 'en';
+      const LANGUAGE_STORAGE_KEY = 'preferred-language';
+      
+      // 使用从 translations.ts 导入的翻译数据
+      window.TRANSLATIONS = JSON.parse(serializedTranslations);
+      
+      // 获取当前语言
+      function getCurrentLanguage() {
+        // 先检查 URL 参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const langParam = urlParams.get('lang');
+        
+        if (langParam && SUPPORTED_LANGUAGES.includes(langParam)) {
+          return langParam;
+        }
+        
+        // 再检查本地存储
+        const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+        if (savedLanguage && SUPPORTED_LANGUAGES.includes(savedLanguage)) {
+          return savedLanguage;
+        }
+        
+        // 最后使用浏览器语言
+        try {
+          const browserLang = navigator.language.split('-')[0];
+          if (SUPPORTED_LANGUAGES.includes(browserLang)) {
+            return browserLang;
+          }
+        } catch (e) {
+          console.error('Error getting browser language:', e);
+        }
+        
+        // 默认返回英语
+        return DEFAULT_LANGUAGE;
+      }
+      
+      // 翻译函数
+      function translate(key, lang) {
+        const currentLang = lang || getCurrentLanguage();
+        
+        if (!window.TRANSLATIONS[key]) {
+          console.warn(`Translation key not found: ${key}`);
+          return key;
+        }
+        
+        return window.TRANSLATIONS[key][currentLang] || window.TRANSLATIONS[key][DEFAULT_LANGUAGE] || key;
+      }
+      
+      // 将函数暴露到全局作用域
+      window.getCurrentLanguage = getCurrentLanguage;
+      window.translate = translate;
+      
+      // 更新页面内容
+      function updatePageContent() {
+        const currentLang = getCurrentLanguage();
+        
+        // 更新 HTML 标签的 lang 属性
+        document.documentElement.setAttribute('lang', currentLang);
+        
+        // 更新所有带有 data-i18n-key 属性的元素
+        document.querySelectorAll('[data-i18n-key]').forEach(element => {
+          const key = element.getAttribute('data-i18n-key');
+          if (key) {
+            element.textContent = translate(key, currentLang);
+          }
+        });
+        
+        // 更新所有带有 data-i18n-placeholder 属性的输入元素
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+          const key = element.getAttribute('data-i18n-placeholder');
+          if (key) {
+            element.setAttribute('placeholder', translate(key, currentLang));
+          }
+        });
+      }
+      
+      // 设置语言
+      function setLanguage(lang) {
+        if (!SUPPORTED_LANGUAGES.includes(lang)) {
+          console.error(`Unsupported language: ${lang}`);
+          return;
+        }
+        
+        localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+        
+        // 更新 URL 参数
+        const url = new URL(window.location.href);
+        if (lang === DEFAULT_LANGUAGE) {
+          url.searchParams.delete('lang');
+        } else {
+          url.searchParams.set('lang', lang);
+        }
+        window.history.replaceState({}, '', url.toString());
+        
+        updatePageContent();
+      }
+      
+      // 初始化
+      function initI18n() {
+        updatePageContent();
+        
+        // 监听语言切换按钮
+        document.querySelectorAll('[data-language-switcher]').forEach(button => {
+          button.addEventListener('click', () => {
+            const lang = button.getAttribute('data-language');
+            if (lang) {
+              setLanguage(lang);
+            }
+          });
+        });
+      }
+      
+      // 确保页面加载后立即应用翻译
+      document.addEventListener('DOMContentLoaded', function() {
+        initI18n();
+      });
+      
+      // 也在窗口加载时初始化，以确保翻译被应用
+      window.onload = function() {
+        initI18n();
+      };
+      
+      // 将函数暴露给全局作用域
+      window.initI18n = initI18n;
+      window.translate = translate;
+      window.setLanguage = setLanguage;
+      window.getCurrentLanguage = getCurrentLanguage;
+    </script>
+    
+    <!-- 加载全局国际化脚本 -->
+    <script>
+      // 在客户端加载翻译
+      async function loadTranslations() {
+        try {
+          // 使用全局变量获取翻译，如果已经定义
+          if (window.__translations) {
+            console.log('Using pre-loaded translations');
+            return window.__translations;
+          }
+          
+          // 如果没有预加载的翻译，返回确保已经定义的翻译
+          console.log('Using inline translations');
+          return JSON.parse(serializedTranslations);
+        } catch (error) {
+          console.error('Failed to load translations:', error);
+          return {};
+        }
+      }
+    </script>
+    
+    <!-- 导航调试脚本 -->
+    <!-- 调试脚本已移除 -->
+    
+    <!-- 客户端翻译脚本 -->
+    <script>
+      // 在客户端脚本中使用翻译函数
+      window.translate = function(key, language) {
+        const currentLang = language || window.getCurrentLanguage();
+        const translations = window.__translations || JSON.parse(serializedTranslations);
+        
+        if (!translations[key]) {
+          console.warn(`Translation key not found: ${key}`);
+          return key;
+        }
+        
+        return translations[key][currentLang] || translations[key]['en'] || key;
+      };
+    </script>
+  </body>
+</html>

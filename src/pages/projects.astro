@@ -1,0 +1,234 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ProjectFilter from '../components/ProjectFilter.astro';
+import { ArrowUpRight } from 'lucide-react';
+import { getCollection } from 'astro:content';
+
+// 页面元数据
+const pageTitle = "Projects | Wannz";
+const pageDescription = "Explore my portfolio of web development and design projects, showcasing my skills in creating intuitive, accessible, and beautiful digital experiences.";
+const pageImage = "/images/projects-og.jpg"; // 社交媒体分享图片
+const chinesePageTitle = "项目 | Wannz";
+const chinesePageDescription = "探索我的网页开发和设计项目组合，展示我在创建直观、无障碍和美观的数字体验方面的技能。";
+
+// 从 content/projects 目录中获取项目数据
+let allProjects = [];
+try {
+  // 获取所有项目条目
+  const projectEntries = await getCollection('projects');
+  
+  // 按日期降序排序（最新的先显示）
+  const sortedEntries = projectEntries.sort((a, b) => {
+    return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
+  });
+  
+  // 映射数据到项目对象
+  allProjects = sortedEntries.map(entry => ({
+    id: entry.data.id,
+    title: entry.data.title,
+    chineseTitle: entry.data.chineseTitle,
+    description: entry.data.description,
+    chineseDescription: entry.data.chineseDescription,
+    tags: entry.data.tags,
+    imageUrl: entry.data.imageUrl,
+    liveUrl: entry.data.liveUrl,
+    githubUrl: entry.data.githubUrl,
+    category: entry.data.category,
+    featured: entry.data.featured,
+    date: entry.data.date,
+    status: entry.data.status,
+    chineseStatus: entry.data.chineseStatus,
+    year: entry.data.year,
+    duration: entry.data.duration,
+    chineseDuration: entry.data.chineseDuration
+  }));
+  
+  console.log(`成功加载 ${allProjects.length} 个项目从 content/projects 目录`);
+} catch (error) {
+  console.error('从 content/projects 加载项目时出错:', error);
+  
+  // 如果加载失败，使用默认项目数据
+  allProjects = [
+    {
+      id: "minimalist-portfolio",
+      title: "Minimalist Portfolio",
+      chineseTitle: "极简作品集",
+      description: "A clean and minimalist portfolio website built with Astro and TailwindCSS.",
+      chineseDescription: "使用 Astro 和 TailwindCSS 构建的简洁极简作品集网站。",
+      tags: ["Astro", "TailwindCSS", "Design", "Portfolio"],
+      imageUrl: "/images/projects/minimalist-portfolio/cover.jpg",
+      liveUrl: "https://example.com/portfolio",
+      githubUrl: "https://github.com/example/portfolio",
+      category: "web",
+      featured: true,
+      date: new Date('2025-03-01')
+    },
+    {
+      id: "digital-garden",
+      title: "Digital Garden",
+      chineseTitle: "数字花园",
+      description: "A personal knowledge management system with beautiful visualizations.",
+      chineseDescription: "具有精美可视化和直观笔记功能的个人知识管理系统。",
+      tags: ["React", "D3.js", "Knowledge Management", "UI/UX"],
+      imageUrl: "/images/projects/digital-garden/cover.jpg",
+      liveUrl: "https://example.com/digital-garden",
+      githubUrl: "https://github.com/example/digital-garden",
+      category: "app",
+      featured: true,
+      date: new Date('2025-02-20')
+    }
+  ];
+}
+
+// 获取精选项目
+const featuredProjects = allProjects.filter(project => project.featured);
+
+// 获取所有项目类别
+const allCategories = [...new Set(
+  allProjects.flatMap(project => {
+    // 处理数组类型的类别
+    if (Array.isArray(project.category)) {
+      return project.category;
+    }
+    // 处理字符串类型的类别
+    return [project.category];
+  })
+)];
+
+// 添加“所有”和“精选”类别
+const categories = [
+  { id: "all", name: "All Projects", chineseName: "所有项目" },
+  { id: "featured", name: "Featured", chineseName: "精选" },
+  ...allCategories.map(cat => ({
+    id: cat,
+    name: cat.charAt(0).toUpperCase() + cat.slice(1),
+    chineseName: cat === 'web' ? '平台网站' : 
+                cat === 'mobile' ? '移动端' : 
+                cat === 'design' ? '设计' : 
+                cat === 'develop' ? '开发' : 
+                cat === 'AI' ? 'AI' : cat
+  }))
+];
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+  image={pageImage}
+>
+  <section class="pt-32 pb-20 px-4">
+    <div class="container mx-auto">
+      <h1 class="h1 mb-8 animate-fade-up" data-i18n-key="projects.title">Projects</h1>
+      
+      <p class="text-lg text-muted-foreground mb-16 animate-fade-up animate-delay-100" data-i18n-key="projects.description">
+        A record of the product projects I've been involved in, which are a testament to my growth. Each project documents how I transformed requirements into actual features, and the process of solving problems within a team. The experiences may be ordinary, but they are my authentic accumulation.
+      </p>
+      
+      <!-- Filter Controls -->
+      <ProjectFilter categories={categories} class="mb-12" />
+      
+      <!-- Projects Grid -->
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16" id="projects-grid">
+        {allProjects.map((project, idx) => (
+          <div data-category={Array.isArray(project.category) ? JSON.stringify(project.category) : project.category} class="project-container animate-fade-up" style={`animation-delay: ${idx * 100}ms;`}>
+            <ProjectCard 
+              id={project.id}
+              title={project.title}
+              chineseTitle={project.chineseTitle}
+              description={project.description}
+              chineseDescription={project.chineseDescription}
+              tags={project.tags}
+              imageUrl={project.imageUrl}
+              githubUrl={project.githubUrl}
+              liveUrl={project.liveUrl}
+              category={project.category}
+              featured={project.featured}
+              index={idx}
+              projectUrl={`/projects/${project.id}`}
+            />
+          </div>
+        ))}
+      </div>
+      
+      <!-- No Projects Message (initially hidden) -->
+      <div id="no-projects-message" class="text-center py-20 hidden">
+        <h3 class="text-xl font-bold mb-2" data-i18n-key="projects.noProjects.title">
+          No projects found
+        </h3>
+        <p class="text-muted-foreground" data-i18n-key="projects.noProjects.description">
+          There are currently no projects in this category. Please check back later or explore other categories.
+        </p>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  .project-container.hidden {
+    display: none;
+  }
+  
+  /* 确保网格布局在筛选时保持美观 */
+  @media (min-width: 768px) {
+    #projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    #projects-grid {
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+  }
+</style>
+
+<script>
+  // 使用优化的国际化客户端脚本
+  import { initI18n, updatePageContent } from '../scripts/i18n-client';
+  import { getCurrentLanguage, translateSync } from '../scripts/i18n-client';
+  
+  // 初始化国际化
+  document.addEventListener('DOMContentLoaded', () => {
+    initI18n().then(() => {
+      // 翻译加载完成后更新页面内容
+      updatePageContent();
+      updateProjectTitles();
+    });
+  });
+  
+  // 监听语言变化事件
+  document.addEventListener('languageChanged', () => {
+    updatePageContent();
+    updateProjectTitles();
+  });
+  
+  // 更新项目标题和描述
+  function updateProjectTitles() {
+    // 获取当前语言
+    const currentLang = getCurrentLanguage();
+    
+    // 选择所有项目卡片
+    document.querySelectorAll('.project-card').forEach(card => {
+      const projectId = card.getAttribute('data-project-id');
+      if (!projectId) return;
+      
+      // 更新标题
+      const titleElement = card.querySelector('.project-title');
+      if (titleElement) {
+        const titleKey = `project.${projectId}.title`;
+        titleElement.textContent = translateSync(titleKey, currentLang);
+      }
+      
+      // 更新描述
+      const descriptionElement = card.querySelector('.project-description');
+      if (descriptionElement) {
+        const descriptionKey = `project.${projectId}.description`;
+        descriptionElement.textContent = translateSync(descriptionKey, currentLang);
+      }
+    });
+  }
+</script>

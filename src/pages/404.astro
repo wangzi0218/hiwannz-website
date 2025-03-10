@@ -1,0 +1,73 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { ArrowRight, Home, FolderOpen } from 'lucide-react';
+
+// 页面元数据
+const pageTitle = "404 | Page Not Found";
+const pageDescription = "The page you are looking for doesn't exist or has been moved.";
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  <div class="fixed inset-0 flex items-center justify-center">
+    <div class="text-center px-4 max-w-lg">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-6" data-i18n-key="404.title">Page Not Found</h1>
+      
+      <p class="text-lg text-muted-foreground mb-10" data-i18n-key="404.description">
+        The page you are looking for doesn't exist or has been moved.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a 
+          href="/" 
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          <Home size={18} />
+          <span data-i18n-key="404.goHome">Go back home</span>
+        </a>
+        
+        <a 
+          href="/projects" 
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+        >
+          <FolderOpen size={18} />
+          <span data-i18n-key="404.explore">Explore projects</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<script>
+  // 使用优化的国际化客户端脚本
+  import { initI18n, updatePageContent } from '../scripts/i18n-client';
+  
+  // DOM 元素
+  let isMounted = false;
+  let isI18nReady = false;
+  
+  // 初始化国际化
+  async function setupI18n() {
+    try {
+      await initI18n();
+      isI18nReady = true;
+      updateContent();
+    } catch (error) {
+      console.error('Failed to initialize i18n:', error);
+    }
+  }
+  
+  // 更新内容
+  function updateContent() {
+    if (isMounted && isI18nReady) {
+      updatePageContent();
+    }
+  }
+  
+  // 客户端挂载
+  if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', () => {
+      isMounted = true;
+      setupI18n();
+    });
+  }
+</script>

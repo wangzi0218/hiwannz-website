@@ -1,0 +1,115 @@
+---
+import { Calendar, Clock, ArrowRight } from 'lucide-react';
+
+// 博客文章数据
+const blogPosts = [
+  {
+    title: "设计极简主义网站的 7 个关键原则",
+    excerpt: "探索如何通过简约设计、有意义的留白和精心选择的排版来创建既美观又实用的极简主义网站。",
+    date: "2023-10-15",
+    readTime: "5 min read",
+    slug: "minimalist-website-design-principles",
+    category: "设计",
+    image: "/images/blog/minimalist-design.jpg"
+  },
+  {
+    title: "使用 Astro 构建高性能静态网站",
+    excerpt: "了解 Astro 如何通过其独特的部分水合方法和基于岛屿的架构，帮助开发者构建更快、更高效的网站。",
+    date: "2023-09-22",
+    readTime: "8 min read",
+    slug: "building-high-performance-websites-with-astro",
+    category: "开发",
+    image: "/images/blog/astro-performance.jpg"
+  },
+  {
+    title: "现代 UI 设计中的微交互：提升用户体验的小细节",
+    excerpt: "探索微交互如何通过提供即时反馈、引导用户注意力和创造愉悦体验来显著提升数字产品的用户体验。",
+    date: "2023-08-30",
+    readTime: "6 min read",
+    slug: "microinteractions-in-modern-ui-design",
+    category: "用户体验",
+    image: "/images/blog/microinteractions.jpg"
+  }
+];
+---
+
+<section id="blog" class="py-20">
+  <div class="container mx-auto px-4">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12">
+        <h2 class="h2 mb-4 sm:mb-0">Latest Articles</h2>
+        <a 
+          href="/blog" 
+          class="group inline-flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+        >
+          View all articles
+          <ArrowRight class="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+        </a>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {blogPosts.map(post => (
+          <article class="group bg-card border border-border rounded-lg overflow-hidden hover:border-primary transition-colors">
+            <a href={`/blog/${post.slug}`} class="block">
+              <div class="relative aspect-[16/9] overflow-hidden">
+                <img 
+                  src={post.image || "https://placehold.co/800x450"} 
+                  alt={post.title}
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div class="absolute top-4 left-4">
+                  <span class="px-3 py-1 bg-primary/80 backdrop-blur-sm text-primary-foreground rounded-full text-xs font-medium">
+                    {post.category}
+                  </span>
+                </div>
+              </div>
+            </a>
+            
+            <div class="p-6">
+              <div class="flex items-center gap-4 text-xs text-muted-foreground mb-3">
+                <div class="flex items-center gap-1">
+                  <Calendar class="h-3.5 w-3.5" />
+                  <time datetime={post.date}>
+                    {new Date(post.date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </time>
+                </div>
+                <div class="flex items-center gap-1">
+                  <Clock class="h-3.5 w-3.5" />
+                  <span>{post.readTime}</span>
+                </div>
+              </div>
+              
+              <h3 class="text-xl font-medium mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                <a href={`/blog/${post.slug}`}>{post.title}</a>
+              </h3>
+              
+              <p class="text-muted-foreground mb-4 line-clamp-3">{post.excerpt}</p>
+              
+              <a 
+                href={`/blog/${post.slug}`} 
+                class="inline-flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+              >
+                Read more
+                <ArrowRight class="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+      
+      <div class="mt-12 text-center">
+        <a 
+          href="/blog" 
+          class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md font-medium transition-all hover:opacity-90"
+        >
+          Explore All Articles
+          <ArrowRight class="h-4 w-4" />
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

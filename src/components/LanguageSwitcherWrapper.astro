@@ -1,0 +1,8 @@
+---
+import { LanguageSwitcher } from './LanguageContext';
+import LanguageProvider from './LanguageProvider.astro';
+---
+
+<LanguageProvider>
+  <LanguageSwitcher client:only="react" className="flex items-center" />
+</LanguageProvider>

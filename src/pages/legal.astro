@@ -1,0 +1,163 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { Shield, Copyright, Eye, Link, FileText } from 'lucide-astro';
+
+// 页面元数据
+const pageTitle = "Legal Notice | Wannz";
+const pageDescription = "Important legal information about this website, including copyright, liability, and privacy policies.";
+const pageImage = "/images/legal-og.jpg"; // 社交媒体分享图片
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+  image={pageImage}
+>
+  <section class="pt-32 pb-20 px-4">
+    <div class="container mx-auto">
+      <h1 class="h1 mb-8 animate-fade-up" data-i18n-key="legal.title">Legal Notice</h1>
+      
+      <p class="text-lg text-muted-foreground mb-16 animate-fade-up animate-delay-100" data-i18n-key="legal.description">
+        Important legal information about this website, including copyright, liability, and privacy policies.
+      </p>
+      
+      <div class="space-y-8 animate-fade-up animate-delay-200">
+        <!-- 版权声明 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-4">
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <Copyright class="w-6 h-6 text-gray-700" />
+              </div>
+            </div>
+            <div class="flex-grow">
+              <h2 class="text-2xl font-semibold mb-4" data-i18n-key="legal.copyright.title"></h2>
+              <div class="space-y-4">
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.copyright.content"></p>
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.copyright.additional"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 内容责任声明 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-4">
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <Shield class="w-6 h-6 text-gray-700" />
+              </div>
+            </div>
+            <div class="flex-grow">
+              <h2 class="text-2xl font-semibold mb-4" data-i18n-key="legal.liability.title"></h2>
+              <div class="space-y-4">
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.liability.content"></p>
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.liability.additional"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 隐私政策 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-4">
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <Eye class="w-6 h-6 text-gray-700" />
+              </div>
+            </div>
+            <div class="flex-grow">
+              <h2 class="text-2xl font-semibold mb-4" data-i18n-key="legal.privacy.title"></h2>
+              <div class="space-y-4">
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.privacy.content"></p>
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.privacy.additional"></p>
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.privacy.dataCollection"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 外部链接 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-4">
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <Link class="w-6 h-6 text-gray-700" />
+              </div>
+            </div>
+            <div class="flex-grow">
+              <h2 class="text-2xl font-semibold mb-4" data-i18n-key="legal.externalLinks.title"></h2>
+              <div class="space-y-4">
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.externalLinks.content"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 变更声明 -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mr-4">
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <FileText class="w-6 h-6 text-gray-700" />
+              </div>
+            </div>
+            <div class="flex-grow">
+              <h2 class="text-2xl font-semibold mb-4" data-i18n-key="legal.changes.title"></h2>
+              <div class="space-y-4">
+                <p class="text-gray-700 leading-relaxed" data-i18n-key="legal.changes.content"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 最后更新时间 -->
+      <div class="mt-12 text-right text-sm text-gray-500">
+        <span data-i18n-key="legal.lastUpdated"></span>: 2025-03-08
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+  // 使用优化的国际化客户端脚本
+  import { initI18n, translateSync, getCurrentLanguage } from '../scripts/i18n-client';
+  
+  // 更新页面内容
+  function updatePageContent() {
+    const elements = document.querySelectorAll('[data-i18n-key]');
+    const currentLang = getCurrentLanguage();
+    
+    elements.forEach(el => {
+      const key = el.getAttribute('data-i18n-key');
+      if (key) {
+        el.textContent = translateSync(key, currentLang);
+      }
+    });
+  }
+  
+  // 页面加载完成后初始化国际化
+  document.addEventListener('DOMContentLoaded', () => {
+    // 初始化国际化并在加载完成后更新页面内容
+    initI18n().then(() => {
+      updatePageContent();
+    });
+    
+    // 监听语言变化事件
+    document.addEventListener('languageChanged', () => {
+      updatePageContent();
+    });
+  });
+</script>

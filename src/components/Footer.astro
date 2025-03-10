@@ -1,0 +1,72 @@
+---
+// 获取当前年份
+const currentYear = new Date().getFullYear();
+
+// 法律和信息链接
+const legalLinks = [
+  { name: 'Changelog', path: '/changelog' },
+  { name: 'Legal', path: '/legal' },
+  { name: 'Source Code', path: '/source-code' }
+];
+
+// 备案信息
+const icpInfo = {
+  text: '粤ICP备20004648号',
+  url: 'http://beian.miit.gov.cn/'
+};
+
+const securityInfo = {
+  text: '川公网安备 51019002002568号',
+  url: 'http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=51019002002568'
+};
+---
+
+<footer class="py-8 border-t border-border">
+  <div class="container mx-auto px-4">
+    {/* 第一行：版权信息和链接 */}
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+      {/* 左侧：版权信息 */}
+      <div class="mb-4 md:mb-0">
+        <p class="text-sm text-muted-foreground">
+          © {currentYear} Wannz. All rights reserved.
+        </p>
+      </div>
+    </div>
+    
+    {/* 第二行：备案信息和链接 */}
+    <div class="flex flex-col md:flex-row justify-between items-center mt-2">
+      {/* 左侧：备案信息 */}
+      <div class="flex flex-col md:flex-row items-center gap-4 text-xs text-gray-400">
+        <a 
+          href={icpInfo.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="hover:text-gray-500 transition-colors"
+        >
+          {icpInfo.text}
+        </a>
+        <span class="hidden md:inline">|</span>
+        <a 
+          href={securityInfo.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="hover:text-gray-500 transition-colors"
+        >
+          {securityInfo.text}
+        </a>
+      </div>
+      
+      {/* 右侧：法律和信息链接 */}
+      <div class="flex items-center gap-4 mt-4 md:mt-0">
+        {legalLinks.map(link => (
+          <a 
+            href={link.path} 
+            class="text-xs px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 transition-all flex items-center text-gray-400"
+          >
+            {link.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</footer>

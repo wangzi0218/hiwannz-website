@@ -1,0 +1,174 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { getLanguageFromURL } from '../i18n/utils';
+import { ExternalLink } from 'lucide-react';
+import { getCollection } from 'astro:content';
+import { getStickyNoteStyles } from '../utils/colorUtils.js';
+
+// 页面元数据
+const pageTitle = "Design Insights | Wannz";
+const chinesePageTitle = "设计洞察 | Wannz";
+const pageDescription = "Explore insights on product design, UX research, and design principles.";
+const chinesePageDescription = "探索产品设计、用户体验研究和设计原则的见解。";
+const pageImage = "/images/insights-og.jpg"; // 社交媒体分享图片
+
+// 从内容集合中获取博客文章
+const insightEntries = await getCollection('insights');
+
+// 按日期排序（最新的在前）
+const blogPosts = insightEntries.sort((a, b) => {
+  return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
+}).map(entry => {
+  const date = new Date(entry.data.date);
+  return {
+    title: entry.data.title,
+    chineseTitle: entry.data.chineseTitle,
+    excerpt: entry.data.excerpt,
+    chineseExcerpt: entry.data.chineseExcerpt,
+    date,
+    formattedDate: {
+      en: date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+      zh: `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
+    },
+    slug: entry.data.id, // 使用 id 作为 slug
+    id: entry.data.id, // 文章ID
+    timeToRead: entry.data.timeToRead,
+    tags: entry.data.tags
+  };
+});
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+  image={pageImage}
+  chineseTitle={chinesePageTitle}
+  chineseDescription={chinesePageDescription}
+>
+  <section class="pt-32 pb-20 px-4">
+    <div class="container mx-auto">
+      <h1 class="h1 mb-6 animate-fade-up" data-i18n-key="insights.title">Design Insights</h1>
+      
+      <p class="text-lg text-muted-foreground mb-16 animate-fade-up animate-delay-100" data-i18n-key="insights.description">
+        A record of my thoughts on product design. Such as how to understand user needs, plan product direction, and use data to optimize products. The content may be basic, but these are things I find important in my work.
+      </p>
+      
+      <div class="mb-12">
+        <a 
+          href="https://hiwannz.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1 group text-primary font-medium"
+        >
+          <span data-i18n-key="insights.visitBlog">Visit my main blog at hiwannz.com</span>
+          <ExternalLink size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+        </a>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {blogPosts.map((post, index) => {
+          // 使用工具函数获取一致的便利贴样式
+          const { className, style } = getStickyNoteStyles(post.id, true);
+          
+          return (
+            <a 
+              href={`/insights/${post.slug}`}
+              class={`block p-6 animate-fade-up ${className} insight-card`}
+              style={`animation-delay: ${index * 100}ms; ${style}`}
+              data-post-id={post.id}
+            >
+              <div class="flex flex-col h-full">
+                {/* 标签区域 - 移动到顶部 */}
+                <div class="flex flex-wrap gap-2 mb-4">
+                  {post.tags && post.tags.map(tag => (
+                    <span class="inline-block px-3 py-0.5 text-xs font-medium bg-black/5 rounded-full">{tag}</span>
+                  ))}
+                </div>
+                
+                {/* 标题 - 增大字体并调整间距 */}
+                <h3 class="text-xl sm:text-2xl font-bold mb-4 transition-colors insight-title" data-en={post.title} data-zh={post.chineseTitle || post.title}>
+                  {post.title}
+                </h3>
+                
+                {/* 分隔线 */}
+                <div class="w-full h-px bg-black/10 my-4"></div>
+                
+                {/* 摘要 - 使用手写风格字体和斜体 */}
+                <p class="font-serif italic text-black/70 mb-6 flex-grow insight-excerpt" data-en={post.excerpt} data-zh={post.chineseExcerpt || post.excerpt}>
+                  {post.excerpt}
+                </p>
+                
+                {/* 日期信息 - 小字体和更精细的样式 */}
+                <div class="mt-auto pt-4 text-xs text-black/60">
+                  <span class="insight-date" data-en={post.formattedDate.en} data-zh={post.formattedDate.zh}>created: {post.formattedDate.en}</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+      
+      {blogPosts.length === 0 && (
+        <div class="text-center py-20">
+          <h3 class="text-xl font-bold mb-2" data-i18n-key="insights.noArticles">No articles yet</h3>
+          <p class="text-muted-foreground" data-i18n-key="insights.checkBack">Check back soon for new articles and insights.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</MainLayout>
+
+<script>
+  // 使用优化的国际化客户端脚本
+  import { initI18n, updatePageContent } from '../scripts/i18n-client';
+  import { getCurrentLanguage, translateSync } from '../scripts/i18n-client';
+  
+  // 初始化国际化
+  document.addEventListener('DOMContentLoaded', () => {
+    initI18n().then(() => {
+      // 翻译加载完成后更新页面内容
+      updatePageContent();
+      updateInsightCards();
+    });
+  });
+  
+  // 监听语言变化事件
+  document.addEventListener('languageChanged', () => {
+    updatePageContent();
+    updateInsightCards();
+  });
+  
+  // 更新洞察卡片内容
+  function updateInsightCards() {
+    // 获取当前语言
+    const currentLang = getCurrentLanguage();
+    
+    // 选择所有洞察卡片
+    document.querySelectorAll('.insight-card').forEach(card => {
+      // 更新标题
+      const titleElement = card.querySelector('.insight-title');
+      if (titleElement) {
+        // 直接从 data 属性获取对应语言的内容
+        const content = currentLang === 'zh' ? titleElement.getAttribute('data-zh') : titleElement.getAttribute('data-en');
+        if (content) titleElement.textContent = content;
+      }
+      
+      // 更新摘要
+      const excerptElement = card.querySelector('.insight-excerpt');
+      if (excerptElement) {
+        // 直接从 data 属性获取对应语言的内容
+        const content = currentLang === 'zh' ? excerptElement.getAttribute('data-zh') : excerptElement.getAttribute('data-en');
+        if (content) excerptElement.textContent = content;
+      }
+      
+      // 更新日期
+      const dateElement = card.querySelector('.insight-date');
+      if (dateElement) {
+        // 直接使用格式化的日期
+        dateElement.textContent = `created: ${currentLang === 'zh' ? 
+          dateElement.getAttribute('data-zh') || dateElement.textContent : 
+          dateElement.getAttribute('data-en') || dateElement.textContent}`;
+      }
+    });
+  }
+</script>

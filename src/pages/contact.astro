@@ -1,0 +1,181 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { Mail, ExternalLink, MessageSquare, Github, Twitter, Linkedin } from 'lucide-astro';
+
+// 页面元数据
+const pageTitle = "Contact | Wannz";
+const pageDescription = "Get in touch with Wannz for collaboration, project inquiries, or just to say hello.";
+const pageImage = "/images/contact-og.jpg"; // 社交媒体分享图片
+
+// 联系信息
+const contactInfo = {
+  email: "42@hiwannz.com",
+  blog: "hiwannz.com"
+};
+
+// 社交媒体链接
+const socialLinks = [
+  { name: "GitHub", url: "https://github.com/username", icon: Github },
+  { name: "Twitter", url: "https://twitter.com/username", icon: Twitter },
+  { name: "LinkedIn", url: "https://linkedin.com/in/username", icon: Linkedin }
+];
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+  image={pageImage}
+>
+  <section class="pt-32 pb-20 px-4">
+    <div class="container mx-auto">
+      <h1 class="h1 mb-8 animate-fade-up" data-i18n-key="contact.title">Get in Touch</h1>
+      
+      <p class="text-lg text-muted-foreground mb-16 animate-fade-up animate-delay-100" data-i18n-key="contact.description">
+        I'm always open to discussing product design, user experience, or potential collaborations. While I keep things simple, I value every connection and conversation.
+      </p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+        <!-- 联系方式卡片 -->
+        <div class="bg-card border border-border rounded-xl p-8 animate-fade-up animate-delay-200 hover:shadow-md transition-all">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="p-3 bg-primary/10 text-primary rounded-full">
+              <Mail class="h-6 w-6" />
+            </div>
+            <h2 class="h3" data-i18n-key="contact.email.title">Email Me</h2>
+          </div>
+          
+          <p class="text-muted-foreground mb-6" data-i18n-key="contact.email.description">
+            For project inquiries, questions, or just to say hello, feel free to send me an email. I typically respond within 24-48 hours.
+          </p>
+          
+          <a 
+            href={`mailto:${contactInfo.email}`} 
+            class="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+          >
+            {contactInfo.email}
+          </a>
+        </div>
+        
+        <!-- 博客留言卡片 -->
+        <div class="bg-card border border-border rounded-xl p-8 animate-fade-up animate-delay-300 hover:shadow-md transition-all">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="p-3 bg-primary/10 text-primary rounded-full">
+              <MessageSquare class="h-6 w-6" />
+            </div>
+            <h2 class="h3" data-i18n-key="contact.blog.title">Leave a Comment</h2>
+          </div>
+          
+          <p class="text-muted-foreground mb-6" data-i18n-key="contact.blog.description">
+            You can also reach me by leaving a comment on any of my blog posts. I regularly check and respond to comments on my blog.
+          </p>
+          
+          <a 
+            href={`https://${contactInfo.blog}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+          >
+            <span>{contactInfo.blog}</span>
+            <ExternalLink class="h-4 w-4" />
+          </a>
+        </div>
+      </div>
+      
+      <!-- 社交媒体链接 -->
+      <!-- <div class="text-center animate-fade-up animate-delay-400">
+        <p class="text-sm font-medium mb-4" data-i18n-key="contact.info.follow">Follow Me</p>
+        <div class="flex justify-center gap-4">
+          {socialLinks.map(link => (
+            <a 
+              href={link.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="p-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-full transition-colors"
+              aria-label={link.name}
+            >
+              <link.icon class="h-5 w-5" />
+            </a>
+          ))}
+        </div>
+      </div> -->
+    </div>
+  </section>
+</MainLayout>
+
+<script>
+  // 使用优化的国际化客户端脚本
+  import { initI18n, updatePageContent } from '../scripts/i18n-client';
+  import { getCurrentLanguage, translateSync } from '../scripts/i18n-client';
+  
+  // 初始化国际化
+  document.addEventListener('DOMContentLoaded', () => {
+    initI18n().then(() => {
+      // 翻译加载完成后更新页面内容
+      updatePageContent();
+      setupFormSubmission();
+    });
+  });
+  
+  // 监听语言变化事件
+  document.addEventListener('languageChanged', () => {
+    updatePageContent();
+    updateFormStatus();
+  });
+  
+  // 设置表单提交处理
+  function setupFormSubmission() {
+    const form = document.getElementById('contact-form');
+    const formStatus = document.getElementById('form-status');
+    
+    if (form && formStatus) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // 获取当前语言
+        const currentLang = getCurrentLanguage();
+        
+        // 显示发送中状态
+        formStatus.textContent = translateSync('status.sending', currentLang);
+        formStatus.className = 'mt-4 py-2 px-4 bg-primary/10 text-primary rounded-md';
+        formStatus.classList.remove('hidden');
+        
+        // 模拟表单提交
+        try {
+          // 在实际应用中，这里会是一个真实的表单提交逻辑
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // 成功状态
+          formStatus.textContent = translateSync('status.success', currentLang);
+          formStatus.className = 'mt-4 py-2 px-4 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 rounded-md';
+          
+          // 重置表单
+          (form as HTMLFormElement).reset();
+        } catch (error) {
+          // 错误状态
+          formStatus.textContent = translateSync('status.error', currentLang);
+          formStatus.className = 'mt-4 py-2 px-4 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 rounded-md';
+        }
+      });
+    }
+  }
+  
+  // 更新表单状态文本（当语言变化时）
+  function updateFormStatus() {
+    const formStatus = document.getElementById('form-status');
+    if (formStatus && !formStatus.classList.contains('hidden')) {
+      const currentLang = getCurrentLanguage();
+      const statusClass = formStatus.className;
+      
+      // 根据当前状态类确定状态类型
+      let statusType = 'sending';
+      if (statusClass.includes('green')) {
+        statusType = 'success';
+      } else if (statusClass.includes('red')) {
+        statusType = 'error';
+      }
+      
+      // 更新文本
+      formStatus.textContent = translateSync(`status.${statusType}`, currentLang);
+    }
+  }
+</script>

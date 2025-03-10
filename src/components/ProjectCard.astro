@@ -1,0 +1,99 @@
+---
+// 导入 React 组件
+import ProjectCardReact from './ProjectCard';
+
+// 定义 Astro 组件的属性
+interface Props {
+  id: string;
+  title: string;
+  chineseTitle?: string;
+  description: string;
+  chineseDescription?: string;
+  tags: string[];
+  imageUrl: string;
+  liveUrl?: string;
+  githubUrl?: string;
+  category: string;
+  featured: boolean;
+  index: number;
+  projectUrl?: string;
+}
+
+// 获取传入的属性
+const { 
+  id, 
+  title, 
+  chineseTitle,
+  description, 
+  chineseDescription,
+  tags, 
+  imageUrl, 
+  liveUrl, 
+  githubUrl, 
+  category,
+  featured,
+  index,
+  projectUrl
+} = Astro.props;
+
+// 确保 projectUrl 有值，如果没有传入则使用默认值
+const finalProjectUrl = projectUrl || `/projects/${String(id)}`;
+---
+
+<!-- 包装 React 组件，添加国际化支持 -->
+<div class="project-card-wrapper">
+  <div 
+    class="project-card" 
+    data-category={category} 
+    data-featured={featured !== undefined && featured !== null ? featured.toString() : 'false'} 
+    data-project-id={String(id)}
+  >
+    <ProjectCardReact
+      client:visible
+      title={title}
+      chineseTitle={chineseTitle}
+      description={description}
+      chineseDescription={chineseDescription}
+      tags={tags}
+      imageUrl={imageUrl}
+      liveUrl={liveUrl}
+      githubUrl={githubUrl}
+      index={index}
+      projectUrl={finalProjectUrl}
+    />
+  </div>
+</div>
+
+<style>
+  .project-card-wrapper {
+    position: relative;
+  }
+  
+  .project-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .project-card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.5s ease-out forwards;
+    position: relative;
+  }
+  
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* 确保外部链接可以独立点击 */
+  .project-card-link a[data-link-type="external"] {
+    position: relative;
+    z-index: 10;
+  }
+</style>

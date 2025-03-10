@@ -1,0 +1,242 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { getCollection } from 'astro:content';
+import { marked } from 'marked';
+import { getStickyNoteStyles, getDecorativeStickyColors } from '../../utils/colorUtils.js';
+
+// 添加预渲染指令，确保页面在构建时生成静态HTML
+export const prerender = true;
+
+// 配置 marked 以正确处理图片
+marked.use({
+  renderer: {
+    image(href: string, title: string | null, text: string | null) {
+      return `<img src="${href}" alt="${text || ''}" title="${title || ''}" class="rounded-lg my-4 max-w-full" />`;
+    }
+  }
+});
+
+// 获取 insight slug
+export async function getStaticPaths() {
+  // 从内容集合中获取所有 insights
+  const insightEntries = await getCollection('insights');
+  
+  return insightEntries.map(entry => ({
+    params: { insight: entry.data.id },
+    props: { entry }
+  }));
+}
+
+
+
+// 定义洞察数据类型
+interface InsightData {
+  id: string;
+  title: string;
+  chineseTitle: string;
+  description: string;
+  chineseDescription: string;
+  excerpt: string;
+  chineseExcerpt: string;
+  tags: string[];
+  imageUrl: string;
+  category: string;
+  featured: boolean;
+  date: Date;
+  colorIndex?: number;
+  style?: string;
+  className?: string;
+}
+
+interface InsightEntry {
+  data: InsightData;
+  body: string;
+}
+
+// 获取文章数据
+const { entry } = Astro.props as { entry: InsightEntry };
+
+// 防止 entry 为 undefined 的情况
+if (!entry) {
+  console.error('Entry is undefined in [insight].astro');
+  return Astro.redirect('/insights');
+}
+
+// 防止 entry.body 为 undefined 的情况
+if (!entry.body) {
+  console.error(`Entry body is undefined for insight: ${Astro.params.insight}`);
+  return Astro.redirect('/insights');
+}
+
+// 从 Markdown 内容中提取英文和中文部分
+const rawContent = entry.body;
+let englishContent = '';
+let chineseContent = '';
+
+// 提取英文内容（从开始到 <div class="content-zh" 之前的部分）
+const divIndex = rawContent.indexOf('<div class="content-zh"');
+if (divIndex !== -1) {
+  // 使用配置后的 marked 解析 Markdown
+  englishContent = marked.parse(rawContent.substring(0, divIndex).trim());
+  
+  // 提取中文内容（从 <div class="content-zh" 到结束的部分）
+  const closingDivIndex = rawContent.lastIndexOf('</div>');
+  if (closingDivIndex !== -1) {
+    // 去掉 div 标签，只保留内容
+    const zhContentWithTags = rawContent.substring(divIndex, closingDivIndex + 6);
+    const zhContentStart = zhContentWithTags.indexOf('>');
+    if (zhContentStart !== -1) {
+      const zhContentRaw = zhContentWithTags.substring(zhContentStart + 1, zhContentWithTags.length - 6).trim();
+      // 使用配置后的 marked 解析 Markdown
+      chineseContent = marked.parse(zhContentRaw);
+    }
+  }
+} else {
+  // 如果没有找到分隔符，则整个内容作为英文内容
+  // 使用配置后的 marked 解析 Markdown
+  englishContent = marked.parse(rawContent);
+}
+
+// 文章数据
+const insightData = entry.data;
+
+// 页面元数据
+const pageTitle = `${insightData.title} | Wannz`;
+const pageDescription = insightData.excerpt;
+const chinesePageTitle = `${insightData.chineseTitle} | Wannz`;
+const chinesePageDescription = insightData.chineseExcerpt;
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+  chineseTitle={chinesePageTitle}
+  chineseDescription={chinesePageDescription}
+>
+  <section class="pt-32 pb-20 px-4">
+    <div class="container mx-auto">
+      <!-- 返回按钮 -->
+      <a href="/insights" class="inline-flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors mb-8 group animate-fade-up">
+        <ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+        <span class="content-en" data-language="en">Back to Insights</span>
+        <span class="content-zh hidden" data-language="zh">返回洞察列表</span>
+      </a>
+      
+      <!-- 文章内容容器（便利贴风格） -->
+      <div class="relative mb-12">
+        {/* 使用工具函数获取一致的便利贴样式 */}
+        {(() => {
+          const { className, style, colorIndex } = getStickyNoteStyles(insightData.id);
+          // 获取与主卡片不同颜色的装饰性便利贴颜色
+          const [decorColor1, decorColor2] = getDecorativeStickyColors(insightData.id, colorIndex);
+          
+          return (
+            <>
+              <!-- 主要内容卡片 -->
+              <div class={`p-8 animate-fade-up ${className}`}>
+                <!-- 标签展示 -->
+                <div class="flex flex-wrap gap-2 mb-3">
+                  {insightData.tags.map(tag => (
+                    <span class="inline-block px-3 py-0.5 text-xs font-medium bg-black/5 rounded-full">{tag}</span>
+                  ))}
+                </div>
+                
+                <!-- 文章标题已移除，因为内容中已包含 -->
+                
+                <div class="w-full h-px bg-black/10 my-4"></div>
+                
+                <!-- 文章元数据 -->
+                <div class="flex items-center gap-3 text-sm text-black/60 animate-fade-up animate-delay-100 mb-6">
+                  <span>{new Date(insightData.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                  <span>•</span>
+                  <span>{insightData.timeToRead}</span>
+                </div>
+                
+                <!-- 文章内容 -->
+                <div id="article-content" class="prose prose-lg dark:prose-invert max-w-none animate-fade-up animate-delay-200 font-serif">
+                  <!-- 英文内容 -->
+                  <div id="english-content" class="content-en" data-language="en">
+                    <Fragment set:html={englishContent} />
+                  </div>
+                  
+                  <!-- 中文内容 -->
+                  <div id="chinese-content" class="content-zh hidden" data-language="zh">
+                    <Fragment set:html={chineseContent} />
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 装饰性便利贴（右上角） -->
+              <div class={`absolute -top-3 -right-3 w-24 h-24 ${decorColor1.bg} border ${decorColor1.border} rounded-lg shadow-sm transform rotate-[1.5deg] -z-10`}></div>
+              
+              <!-- 装饰性便利贴（左下角） -->
+              <div class={`absolute -bottom-3 -left-3 w-16 h-16 ${decorColor2.bg} border ${decorColor2.border} rounded-lg shadow-sm transform rotate-[-2deg] -z-10`}></div>
+            </>
+          );
+        })()}
+      </div>
+      
+      <!-- 分享链接 -->
+      <div class="flex flex-wrap gap-4 animate-fade-up animate-delay-300">
+        <a 
+          href="/insights" 
+          class="inline-flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-md transition-colors"
+        >
+          <ArrowLeft class="h-5 w-5" />
+          <span class="content-en" data-language="en">Back to all insights</span>
+          <span class="content-zh hidden" data-language="zh">返回所有洞察</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<script>
+  // 使用全局翻译函数
+  document.addEventListener('DOMContentLoaded', () => {
+    // 确保全局函数已经加载
+    if (typeof window.translate === 'function' && typeof window.getCurrentLanguage === 'function') {
+      toggleContentByLanguage();
+    } else {
+      console.error('Translation functions not found. Make sure MainLayout has initialized them.');
+    }
+  });
+  
+  // 监听语言变化事件
+  document.addEventListener('languageChanged', () => {
+    toggleContentByLanguage();
+  });
+  
+  // 切换基于 data-language 属性的内容
+  function toggleContentByLanguage() {
+    const currentLang = window.getCurrentLanguage();
+    
+    // 隐藏所有语言内容
+    document.querySelectorAll('[data-language]').forEach(element => {
+      element.classList.add('hidden');
+    });
+    
+    // 显示当前语言的内容
+    document.querySelectorAll(`[data-language="${currentLang}"]`).forEach(element => {
+      element.classList.remove('hidden');
+    });
+    
+    // 切换文章内容
+    const articleContent = document.getElementById('article-content');
+    if (articleContent) {
+      const englishContent = document.getElementById('english-content');
+      const chineseContent = document.getElementById('chinese-content');
+      
+      if (englishContent && chineseContent) {
+        if (currentLang === 'zh') {
+          englishContent.classList.add('hidden');
+          chineseContent.classList.remove('hidden');
+        } else {
+          englishContent.classList.remove('hidden');
+          chineseContent.classList.add('hidden');
+        }
+      }
+    }
+  }
+</script>

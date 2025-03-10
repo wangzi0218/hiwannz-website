@@ -1,0 +1,249 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { Users, LineChart, Lightbulb, Briefcase, PenTool, Layers } from 'lucide-astro';
+import ContactCTA from '../components/ContactCTA.astro';
+
+// 页面元数据
+const pageTitle = "About | Wannz";
+const pageDescription = "Learn more about Wannz, a product designer passionate about creating intuitive, user-centered, and effective digital experiences.";
+const pageImage = "/images/about-og.jpg"; // 社交媒体分享图片
+
+// 技能数据
+const skills = [
+  { id: "userInsight", name: "User Research & Empathy", icon: Users, description: "Conducting comprehensive user research to deeply understand user needs, pain points, and behaviors. Creating personas and journey maps to build empathy and guide product decisions." },
+  { id: "strategy", name: "Product Strategy & Roadmapping", icon: Lightbulb, description: "Developing clear product vision and strategy aligned with business goals. Creating and prioritizing product roadmaps that balance user needs with technical feasibility and business value." },
+  { id: "collaboration", name: "Cross-functional Leadership", icon: Briefcase, description: "Leading cross-functional teams through the product development process. Effectively communicating with stakeholders at all levels and coordinating between design, engineering, and business teams." },
+  { id: "dataAnalysis", name: "Data-Driven Optimization", icon: LineChart, description: "Leveraging analytics to measure product performance and user behavior. Setting up experiments, analyzing results, and making data-informed decisions to continuously improve products." }
+];
+
+// 经验数据
+const experiences = [
+  {
+    id: "job1",
+    position: "Product Director",
+    company: "Finogeeks Technology Co., Ltd.",
+    period: "2021 - Present"
+  },
+  {
+    id: "job2",
+    position: "Senior Product Manager",
+    company: "WIDEAL Technology Co., Ltd.",
+    period: "2020 - 2021"
+  },
+  {
+    id: "job3",
+    position: "Product & Project Manager",
+    company: "GhostCloud Technology Co., Ltd.",
+    period: "2019 - 2020"
+  },
+  {
+    id: "job4",
+    position: "Product & Project Manager",
+    company: "Knownsec Information Technology Co., Ltd.",
+    period: "2017 - 2019"
+  }
+];
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+  image={pageImage}
+>
+  {/* Hero Section */}
+  <section class="pt-32 pb-20 px-4">
+    <div class="container mx-auto">
+      <h1 class="h1 mb-6 animate-fade-up" data-i18n-key="about.title">About Me</h1>
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="animate-fade-right">
+          <p class="text-lg mb-6" data-i18n-key="about.bio.p1">
+            Hey, I'm Wannz, a product manager who prefers to be called a “product designer.” I decode user needs, execute strategies, and ensure a great user experience. My job is to turn vague ideas into tangible, user-focused features.
+          </p>
+          <p class="text-lg mb-6" data-i18n-key="about.bio.p2">
+            As an “ENFJ-T with a touch of OCD,” I’m driven by idealism. It might seem impractical, but I believe it’s essential for creating truly outstanding products. I’ve worked in both startups and large companies, learning to be agile and detail-oriented while balancing user needs and business goals.
+          </p>
+          <p class="text-lg mb-8" data-i18n-key="about.bio.p3">
+            I navigate different teams and functions, coordinating efforts and ensuring efficiency. I’m sensitive to user feedback and strive for perfection, even if it keeps me up at night. I’m committed to creating products that truly meet user expectations.
+          </p>
+        </div>
+        <div class="relative animate-fade-left">
+          <div class="aspect-square rounded-2xl overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7" 
+              alt="Profile" 
+              class="w-full h-full object-cover" 
+              data-i18n-key="about.profile.alt"
+            />
+          </div>
+          <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-xl">
+            8+
+            <span class="text-xs absolute top-1/2 mt-5 text-center w-full">Years</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Skills Section */}
+  <section class="py-20 px-4 bg-secondary/30">
+    <div class="container mx-auto">
+      <h2 class="h2 mb-12" data-i18n-key="about.skills.title">My Expertise</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {skills.map((skill, index) => (
+          <div 
+            class="p-6 rounded-lg border border-border hover:border-primary/20 bg-card transition-all duration-300 animate-fade-up"
+            style={`animation-delay: ${index * 100}ms`}
+          >
+            <div class="p-3 bg-primary/10 rounded-lg w-fit mb-4">
+              <skill.icon className="h-6 w-6" />
+            </div>
+            <h3 class="text-xl font-bold mb-2 skill-name" data-i18n-key={`about.skill.${skill.id}.name`}>{skill.name}</h3>
+            <p class="text-muted-foreground skill-description" data-i18n-key={`about.skill.${skill.id}.description`}>{skill.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Experience Section */}
+  <section class="py-20 px-4">
+    <div class="container mx-auto">
+      <h2 class="h2 mb-12" data-i18n-key="about.experience.title">工作经历</h2>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+        {/* 左侧：工作经历描述 */}
+        <div class="lg:col-span-3 animate-fade-right">
+          <div class="text-muted-foreground">
+            <div class="content-en" data-language="en">
+              <p class="mb-4">Over the years, my professional journey has been like an exploration, with each step clear and determined. From my initial role in product operations in the internet industry, to growing into a product manager, and then to becoming a product leader and director, I've always maintained curiosity about the unknown and pursued excellence.</p>
+              <p class="mb-4">Throughout this process, I've ventured into various product domains, whether user-facing internet applications, complex backend systems, or challenging platform and commercialization projects. From mobile applications to mini-programs, from desktop software to hardware products, and even vehicle cockpits and AI products, each experience has deepened my understanding of product design and management.</p>
+              <p class="mb-4">I've also accumulated rich team management experience, leading teams composed of product managers, designers, and developers. As a core product leader, I've always worked closely with sales, delivery, operations, and development teams to tackle user and client challenges, creating value for both the team and company.</p>
+              <p>Despite experiencing different roles and companies, I've always carried hopes for the future, continuously exploring and trying, all to find the answer that truly belongs to me.</p>
+            </div>
+            
+            <div class="content-zh hidden" data-language="zh">
+              <p class="mb-4">在过去的岁月里，我的职业旅程如同一场探索之旅，每一步都清晰而坚定。从最初踏入互联网领域的产品运营，到逐步成长为产品经理，再到肩负重任的产品负责人和产品总监，我始终保持着对未知的好奇与对卓越的追求。</p>
+              <p class="mb-4">在这个过程中，我涉足了多种产品领域，无论是直面用户的互联网应用，还是复杂的中后台系统，亦或是充满挑战的平台化与商业化项目，我都收获了宝贵的经验。从移动端应用到小程序，从桌面端软件到硬件产品，甚至还包括车机座舱与 AI 产品，每一次尝试都让我对产品设计与管理有了更深刻的理解。</p>
+              <p class="mb-4">我也积累了丰富的团队管理经验，带领过由产品经理、设计师、研发人员等多角色组成的团队。作为核心产品负责人，我始终与销售、交付、运营、研发等团队紧密协作，共同攻克用户和客户的问题，为团队和公司创造价值。</p>
+              <p>尽管历经不同角色与公司，我始终怀揣着对未来的期望，不断探索与尝试，只为找到真正属于自己的答案。</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* 右侧：按时间顺序展示工作经历 */}
+        <div class="lg:col-span-2 animate-fade-left">
+          <div class="space-y-8">
+            {experiences.map((exp, index) => (
+              <div class="animate-fade-up" style={`animation-delay: ${index * 100}ms`}>
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-muted-foreground exp-company" data-i18n-key={`about.experience.${exp.id}.company`}>{exp.company}</p>
+                    <p class="text-primary font-medium text-lg exp-position" data-i18n-key={`about.experience.${exp.id}.title`}>{exp.position}</p>
+                  </div>
+                  <p class="text-sm text-muted-foreground whitespace-nowrap exp-period" data-i18n-key={`about.experience.${exp.id}.period`}>{exp.period}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* 联系 CTA 部分 */}
+  <ContactCTA />
+</MainLayout>
+
+<script>
+  // 使用优化的国际化客户端脚本
+  import { initI18n, updatePageContent } from '../scripts/i18n-client';
+  import { getCurrentLanguage, translateSync } from '../scripts/i18n-client';
+  
+  // 初始化国际化
+  document.addEventListener('DOMContentLoaded', () => {
+    initI18n().then(() => {
+      // 翻译加载完成后更新页面内容
+      updatePageContent();
+      updateSkillsContent();
+      updateExperienceContent();
+      toggleContentByLanguage();
+    });
+  });
+  
+  // 监听语言变化事件
+  document.addEventListener('languageChanged', () => {
+    updatePageContent();
+    updateSkillsContent();
+    updateExperienceContent();
+    toggleContentByLanguage();
+  });
+
+  // 更新技能内容
+  function updateSkillsContent() {
+    const currentLang = getCurrentLanguage();
+    
+    // 选择所有技能卡片
+    document.querySelectorAll('.skill-name').forEach(element => {
+      const key = element.getAttribute('data-i18n-key');
+      if (key) {
+        element.textContent = translateSync(key, currentLang);
+      }
+    });
+
+    document.querySelectorAll('.skill-description').forEach(element => {
+      const key = element.getAttribute('data-i18n-key');
+      if (key) {
+        element.textContent = translateSync(key, currentLang);
+      }
+    });
+  }
+
+  // 更新工作经验内容
+  function updateExperienceContent() {
+    const currentLang = getCurrentLanguage();
+    
+    // 选择所有工作经验元素
+    document.querySelectorAll('.exp-position').forEach(element => {
+      const key = element.getAttribute('data-i18n-key');
+      if (key) {
+        element.textContent = translateSync(key, currentLang);
+      }
+    });
+
+    document.querySelectorAll('.exp-company').forEach(element => {
+      const key = element.getAttribute('data-i18n-key');
+      if (key) {
+        element.textContent = translateSync(key, currentLang);
+      }
+    });
+
+    document.querySelectorAll('.exp-period').forEach(element => {
+      const key = element.getAttribute('data-i18n-key');
+      if (key) {
+        element.textContent = translateSync(key, currentLang);
+      }
+    });
+
+    document.querySelectorAll('.exp-description').forEach(element => {
+      const key = element.getAttribute('data-i18n-key');
+      if (key) {
+        element.textContent = translateSync(key, currentLang);
+      }
+    });
+  }
+  
+  // 切换基于 data-language 属性的内容
+  function toggleContentByLanguage() {
+    const currentLang = getCurrentLanguage();
+    
+    // 隐藏所有语言内容
+    document.querySelectorAll('[data-language]').forEach(element => {
+      element.classList.add('hidden');
+    });
+    
+    // 显示当前语言的内容
+    document.querySelectorAll(`[data-language="${currentLang}"]`).forEach(element => {
+      element.classList.remove('hidden');
+    });
+  }
+</script>

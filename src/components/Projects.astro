@@ -1,0 +1,221 @@
+---
+import { Github, ExternalLink } from 'lucide-react';
+
+// 项目数据
+const projects = [
+  {
+    title: "个人作品集网站",
+    description: "使用 Astro、React 和 TailwindCSS 构建的个人作品集网站，具有优雅的动画效果和响应式设计。",
+    tags: ["Astro", "React", "TailwindCSS", "Framer Motion"],
+    image: "/images/projects/portfolio.jpg",
+    github: "https://github.com/username/portfolio",
+    demo: "https://example.com",
+    featured: true
+  },
+  {
+    title: "设计系统",
+    description: "为企业应用程序创建的全面设计系统，包括组件库、设计令牌和使用指南。",
+    tags: ["React", "Storybook", "Figma", "TypeScript"],
+    image: "/images/projects/design-system.jpg",
+    github: "https://github.com/username/design-system",
+    demo: "https://design-system-demo.example.com",
+    featured: true
+  },
+  {
+    title: "电子商务平台",
+    description: "功能齐全的电子商务平台，具有产品目录、购物车、结账流程和管理面板。",
+    tags: ["Next.js", "MongoDB", "Stripe", "TailwindCSS"],
+    image: "/images/projects/ecommerce.jpg",
+    github: "https://github.com/username/ecommerce",
+    demo: "https://ecommerce-demo.example.com",
+    featured: true
+  },
+  {
+    title: "天气应用",
+    description: "简洁优雅的天气应用，提供实时天气数据、预报和位置搜索功能。",
+    tags: ["Vue.js", "API Integration", "CSS Animation"],
+    image: "/images/projects/weather-app.jpg",
+    github: "https://github.com/username/weather-app",
+    demo: "https://weather-app.example.com",
+    featured: false
+  },
+  {
+    title: "任务管理工具",
+    description: "帮助用户组织和跟踪任务的应用程序，具有拖放界面和数据可视化功能。",
+    tags: ["React", "Redux", "Firebase", "ChartJS"],
+    image: "/images/projects/task-manager.jpg",
+    github: "https://github.com/username/task-manager",
+    demo: "https://task-manager.example.com",
+    featured: false
+  },
+  {
+    title: "博客平台",
+    description: "支持 Markdown 的博客平台，具有标签、分类和搜索功能。",
+    tags: ["Gatsby", "GraphQL", "Netlify CMS"],
+    image: "/images/projects/blog-platform.jpg",
+    github: "https://github.com/username/blog-platform",
+    demo: "https://blog-platform.example.com",
+    featured: false
+  }
+];
+
+// 获取特色项目
+const featuredProjects = projects.filter(project => project.featured);
+// 获取非特色项目
+const otherProjects = projects.filter(project => !project.featured);
+---
+
+<section id="projects" class="py-20">
+  <div class="container mx-auto px-4">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="h2 mb-8">Projects</h2>
+      
+      <!-- 特色项目 -->
+      <div class="space-y-20 mb-20">
+        {featuredProjects.map((project, index) => (
+          <div class="group">
+            <div class={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+              <!-- 项目图片 -->
+              <div class="lg:col-span-7 overflow-hidden rounded-lg border border-border">
+                <div class="relative aspect-video overflow-hidden">
+                  <img 
+                    src={project.image || "https://placehold.co/800x450"} 
+                    alt={project.title}
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div class="flex gap-4">
+                      {project.github && (
+                        <a 
+                          href={project.github} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          class="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-colors"
+                          aria-label="View GitHub Repository"
+                        >
+                          <Github class="h-6 w-6 text-white" />
+                        </a>
+                      )}
+                      {project.demo && (
+                        <a 
+                          href={project.demo} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          class="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-colors"
+                          aria-label="View Live Demo"
+                        >
+                          <ExternalLink class="h-6 w-6 text-white" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 项目信息 -->
+              <div class="lg:col-span-5">
+                <h3 class="h3 mb-3 group-hover:text-primary transition-colors">{project.title}</h3>
+                <p class="text-muted-foreground mb-4">{project.description}</p>
+                <div class="flex flex-wrap gap-2 mb-6">
+                  {project.tags.map(tag => (
+                    <span class="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div class="flex gap-4">
+                  {project.github && (
+                    <a 
+                      href={project.github} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      class="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+                    >
+                      <Github class="h-4 w-4" /> GitHub
+                    </a>
+                  )}
+                  {project.demo && (
+                    <a 
+                      href={project.demo} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      class="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+                    >
+                      <ExternalLink class="h-4 w-4" /> Live Demo
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <!-- 其他项目 -->
+      <h3 class="h3 mb-8">Other Projects</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {otherProjects.map(project => (
+          <div class="group bg-card border border-border rounded-lg overflow-hidden hover:border-primary transition-colors">
+            <div class="relative aspect-video overflow-hidden">
+              <img 
+                src={project.image || "https://placehold.co/400x225"} 
+                alt={project.title}
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+            <div class="p-6">
+              <h4 class="text-lg font-medium mb-2 group-hover:text-primary transition-colors">{project.title}</h4>
+              <p class="text-sm text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                {project.tags.slice(0, 3).map(tag => (
+                  <span class="px-2 py-1 bg-secondary text-secondary-foreground rounded-full text-xs">
+                    {tag}
+                  </span>
+                ))}
+                {project.tags.length > 3 && (
+                  <span class="px-2 py-1 bg-secondary text-secondary-foreground rounded-full text-xs">
+                    +{project.tags.length - 3}
+                  </span>
+                )}
+              </div>
+              <div class="flex gap-4">
+                {project.github && (
+                  <a 
+                    href={project.github} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="text-sm hover:text-primary transition-colors"
+                    aria-label="View GitHub Repository"
+                  >
+                    <Github class="h-4 w-4" />
+                  </a>
+                )}
+                {project.demo && (
+                  <a 
+                    href={project.demo} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="text-sm hover:text-primary transition-colors"
+                    aria-label="View Live Demo"
+                  >
+                    <ExternalLink class="h-4 w-4" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div class="mt-12 text-center">
+        <a 
+          href="/projects" 
+          class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md font-medium transition-all hover:opacity-90"
+        >
+          View All Projects
+          <ExternalLink class="h-4 w-4" />
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,1 @@
+import{i as n}from"./i18n-client._cUWEELK.js";import"./Navbar.astro_astro_type_script_index_0_lang.03Xj5Fc1.js";document.addEventListener("DOMContentLoaded",()=>{n()});marked.use({renderer:{image(e,r,t){return`<img src="${e}" alt="${t||""}" title="${r||""}" class="rounded-lg my-4 max-w-full" />`}}});

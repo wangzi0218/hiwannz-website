@@ -1,0 +1,180 @@
+---
+// 接收类别列表作为属性
+interface Category {
+  id: string;
+  name: string;
+  chineseName: string;
+}
+
+interface Props {
+  categories: Category[];
+  class?: string;
+}
+
+const { categories, class: className } = Astro.props;
+---
+
+<div class={`project-filter mb-10 ${className || ''}`}>
+  <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+    {categories.map((category) => {
+      // 确保类别名称是字符串而非 Promise
+      const categoryName = typeof category.name === 'string' ? category.name : 
+                          (category.id === 'all' ? 'All Projects' : 
+                           category.id === 'featured' ? 'Featured' : 
+                           category.id.charAt(0).toUpperCase() + category.id.slice(1));
+      
+      return (
+        <button
+          class="filter-btn px-4 py-2 rounded-full border border-border hover:bg-primary/10 transition-colors"
+          data-filter={category.id}
+          data-i18n-key={`projects.filter.${category.id}`}
+          data-category-name={categoryName}
+        >
+          {categoryName}
+        </button>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  // 初始化过滤功能
+  document.addEventListener('DOMContentLoaded', () => {
+    initFilter();
+    updateFilterButtonsFromLanguage();
+  });
+
+  // 监听语言变化事件
+  document.addEventListener('languageChanged', () => {
+    updateFilterButtonsFromLanguage();
+  });
+
+  // 初始化过滤功能
+  function initFilter() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+    const projectContainers = document.querySelectorAll('[data-category]');
+    const noProjectsMessage = document.getElementById('no-projects-message');
+    
+    // 默认选中"全部"按钮
+    const allButton = document.querySelector('[data-filter="all"]');
+    if (allButton) {
+      allButton.classList.add('bg-primary', 'text-white', 'hover:bg-primary');
+    }
+    
+    // 添加点击事件
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // 移除所有按钮的活跃状态
+        filterButtons.forEach(btn => {
+          btn.classList.remove('bg-primary', 'text-white', 'hover:bg-primary');
+        });
+        
+        // 添加当前按钮的活跃状态
+        button.classList.add('bg-primary', 'text-white', 'hover:bg-primary');
+        
+        // 获取过滤类别
+        const filter = button.getAttribute('data-filter');
+        
+        // 用于检查是否有可见项目
+        let visibleCount = 0;
+        
+        // 过滤项目
+        projectContainers.forEach(container => {
+          const card = container.querySelector('.project-card');
+          if (!card) return;
+          
+          let shouldShow = false;
+          
+          if (filter === 'all') {
+            shouldShow = true;
+          } else if (filter === 'featured') {
+            shouldShow = card.getAttribute('data-featured') === 'true';
+          } else {
+            // 获取项目类别（可能是单个字符串或JSON数组字符串）
+            const categoryAttr = container.getAttribute('data-category');
+            
+            // 尝试解析为数组
+            try {
+              // 如果是JSON数组字符串
+              if (categoryAttr.startsWith('[')) {
+                const categories = JSON.parse(categoryAttr);
+                shouldShow = categories.includes(filter);
+              } else {
+                // 如果是单个字符串
+                shouldShow = categoryAttr === filter;
+              }
+            } catch (e) {
+              // 解析失败，默认为单个字符串比较
+              shouldShow = categoryAttr === filter;
+            }
+          }
+          
+          if (shouldShow) {
+            container.classList.remove('hidden');
+            visibleCount++;
+            setTimeout(() => {
+              // 使用 setAttribute 代替直接设置 style 属性
+              card.setAttribute('style', 'opacity: 1; transform: translateY(0);');
+            }, 10);
+          } else {
+            // 使用 setAttribute 代替直接设置 style 属性
+            card.setAttribute('style', 'opacity: 0; transform: translateY(20px);');
+            setTimeout(() => {
+              container.classList.add('hidden');
+            }, 300);
+          }
+        });
+        
+        // 显示或隐藏"无项目"消息
+        if (visibleCount === 0) {
+          setTimeout(() => {
+            if (noProjectsMessage) {
+              noProjectsMessage.classList.remove('hidden');
+            }
+          }, 300);
+        } else if (noProjectsMessage) {
+          noProjectsMessage.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  // 根据当前语言更新过滤按钮文本
+  function updateFilterButtonsFromLanguage() {
+    try {
+      // 导入 i18n 客户端脚本
+      import('../scripts/i18n-client').then(({ getCurrentLanguage, translateSync }) => {
+        const currentLang = getCurrentLanguage();
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        
+        filterButtons.forEach(button => {
+          const key = button.getAttribute('data-i18n-key');
+          if (key) {
+            // 使用 translateSync 而非 translate，避免 Promise 类型问题
+            const translatedText = translateSync(key, currentLang);
+            button.textContent = translatedText;
+          } else {
+            // 如果没有翻译键，使用备用名称
+            const categoryName = button.getAttribute('data-category-name');
+            if (categoryName) {
+              button.textContent = categoryName;
+            }
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error updating filter buttons:', error);
+    }
+  }
+</script>
+
+<style>
+  .filter-btn {
+    transition: all 0.3s ease;
+  }
+  
+  .project-card {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+</style>

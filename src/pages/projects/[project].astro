@@ -1,0 +1,509 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { ArrowLeft, ArrowUpRight, Github } from 'lucide-react';
+import { getCollection } from 'astro:content';
+import { marked } from 'marked';
+
+// 添加预渲染指令，确保页面在构建时生成静态HTML
+export const prerender = true;
+
+// 获取当前项目的 ID
+const { project: projectId } = Astro.params;
+
+// 项目详情页面初始化
+
+// 确保项目 ID 存在
+if (!projectId) {
+  console.error('错误: URL 参数中没有提供项目 ID');
+  return Astro.redirect('/projects');
+}
+
+// 预生成所有项目页面的静态路径
+export async function getStaticPaths() {
+  let projects = [];
+  try {
+    // 获取所有项目
+    projects = await getCollection('projects');
+    // 项目集合已加载完成
+    
+    // 项目已加载完成
+  } catch (error) {
+    console.error('Error fetching projects collection');
+    // 如果无法获取项目集合，使用默认数据
+    projects = [
+      {
+        data: {
+          id: 'minimalist-portfolio',
+          title: 'Minimalist Portfolio',
+          chineseTitle: '极简作品集',
+          description: 'A clean and minimalist portfolio website built with Astro and TailwindCSS.',
+          chineseDescription: '使用 Astro 和 TailwindCSS 构建的简洁极简作品集网站。',
+          tags: ['Astro', 'TailwindCSS', 'Design', 'Portfolio'],
+          imageUrl: '/images/projects/minimalist-portfolio/cover.jpg',
+          category: 'web',
+          featured: true,
+          date: new Date()
+        },
+        body: '# Minimalist Portfolio\n\nThis is a clean and minimalist portfolio website built with Astro and TailwindCSS.\n\n<div class="content-zh">\n# 极简作品集\n\n这是一个使用 Astro 和 TailwindCSS 构建的简洁极简作品集网站。\n</div>'
+      },
+      {
+        data: {
+          id: 'digital-garden',
+          title: 'Digital Garden',
+          chineseTitle: '数字花园',
+          description: 'A personal knowledge management system with beautiful visualizations.',
+          chineseDescription: '具有精美可视化和直观笔记功能的个人知识管理系统。',
+          tags: ['React', 'D3.js', 'Knowledge Management', 'UI/UX'],
+          imageUrl: '/images/projects/digital-garden/cover.jpg',
+          category: 'app',
+          featured: true,
+          date: new Date()
+        },
+        body: '# Digital Garden\n\nA personal knowledge management system with beautiful visualizations.\n\n<div class="content-zh">\n# 数字花园\n\n具有精美可视化和直观笔记功能的个人知识管理系统。\n</div>'
+      }
+    ];
+    
+    // 使用默认项目数据
+  }
+  
+  // 为每个项目创建一个路径
+  const paths = projects
+    .filter(entry => entry.data.id) // 只保留有 ID 的项目
+    .map(entry => {
+      try {
+        // 确保 ID 是字符串
+        const projectId = String(entry.data.id);
+        
+        // 深度复制项目数据，确保所有 URL 属性都是字符串
+        const projectData = {...entry.data};
+        
+        // 确保关键属性是字符串
+        if (projectData.id) projectData.id = String(projectData.id);
+        if (projectData.githubUrl) projectData.githubUrl = String(projectData.githubUrl);
+        if (projectData.liveUrl) projectData.liveUrl = String(projectData.liveUrl);
+        if (projectData.imageUrl) projectData.imageUrl = String(projectData.imageUrl);
+        
+        // 项目路径已生成
+        
+        return {
+          params: { project: projectId },
+          props: { project: projectData, content: entry.body || '' }
+        };
+      } catch (error) {
+        console.error(`处理项目时出错`);
+        // 跳过有问题的项目
+        return null;
+      }
+    })
+    .filter(Boolean); // 过滤掉 null 值
+    
+  // 项目路径已生成完成
+  
+  return paths;
+}
+
+// 定义项目数据类型，确保类型安全
+interface ProjectData {
+  id: string;
+  title: string;
+  chineseTitle?: string;
+  description: string;
+  chineseDescription?: string;
+  tags: string[];
+  imageUrl: string;
+  category: string;
+  featured?: boolean;
+  date?: Date;
+  status?: string;
+  chineseStatus?: string;
+  year?: string;
+  duration?: string;
+  chineseDuration?: string;
+  githubUrl?: string;
+  liveUrl?: string;
+  client?: string;
+  chineseClient?: string;
+  team?: {name: string; role: string; chineseRole?: string}[];
+  categoryLabel?: string;
+  chineseCategoryLabel?: string;
+}
+
+// 直接使用传入的项目数据和内容，添加类型断言
+const { project, content: rawContent = '' as string } = Astro.props;
+
+// 确保项目数据是有效的 ProjectData 类型
+const typedProject: ProjectData = project as ProjectData;
+
+// 确保项目所有 URL 相关属性都是字符串
+if (typedProject) {
+  // 确保 ID 是字符串
+  if (typedProject.id) {
+    typedProject.id = String(typedProject.id);
+  }
+  
+  // 确保 GitHub URL 是字符串
+  if (typedProject.githubUrl) {
+    typedProject.githubUrl = String(typedProject.githubUrl);
+  }
+  
+  // 确保 Live URL 是字符串
+  if (typedProject.liveUrl) {
+    typedProject.liveUrl = String(typedProject.liveUrl);
+  }
+  
+  // 确保图片 URL 是字符串
+  if (typedProject.imageUrl) {
+    typedProject.imageUrl = String(typedProject.imageUrl);
+  }
+}
+
+// 打印项目数据信息
+// 项目数据已加载完成
+
+// 检查项目数据是否存在，如果不存在则重定向到项目列表页面
+if (!typedProject || Object.keys(typedProject).length === 0) {
+  console.error(`错误: 项目数据缺失`);
+  return Astro.redirect('/projects');
+}
+
+// 处理 Markdown 内容
+let englishContent = '';
+let chineseContent = '';
+
+try {
+  // 处理原始 Markdown 内容
+  
+  // 分离英文和中文内容
+  if (rawContent) {
+    const divIndex = rawContent.indexOf('<div class="content-zh"');
+    
+    if (divIndex !== -1) {
+      // 如果找到了分隔符，则分别提取英文和中文内容
+      console.log('Found content-zh div at index:', divIndex);
+      const englishMarkdown = await marked.parse(rawContent.substring(0, divIndex).trim());
+      englishContent = typeof englishMarkdown === 'string' ? englishMarkdown : '';
+      
+      const closingDivIndex = rawContent.lastIndexOf('</div>');
+      if (closingDivIndex !== -1) {
+        console.log('Found closing div at index:', closingDivIndex);
+        const zhContentWithTags = rawContent.substring(divIndex, closingDivIndex + 6);
+        const zhContentStart = zhContentWithTags.indexOf('>');
+        if (zhContentStart !== -1) {
+          const zhContentRaw = zhContentWithTags.substring(zhContentStart + 1, zhContentWithTags.length - 6).trim();
+          const chineseMarkdown = await marked.parse(zhContentRaw);
+          chineseContent = typeof chineseMarkdown === 'string' ? chineseMarkdown : '';
+        }
+      }
+    } else {
+      // 如果没有找到分隔符，则整个内容作为英文内容
+      console.log('No content-zh div found, using all content as English');
+      const parsedContent = await marked.parse(rawContent);
+      englishContent = typeof parsedContent === 'string' ? parsedContent : '';
+      // 为中文内容提供一个默认值
+      chineseContent = englishContent;
+    }
+  } else {
+    console.log('No raw content available');
+    // 如果没有原始内容，则使用项目描述作为内容
+    englishContent = `<p>${typedProject?.description || 'No content available'}</p>`;
+    chineseContent = `<p>${typedProject?.chineseDescription || typedProject?.description || '暂无内容'}</p>`;
+  }
+  
+  console.log('English content length:', englishContent?.length || 0);
+  console.log('Chinese content length:', chineseContent?.length || 0);
+} catch (error) {
+  console.error('Error parsing markdown content:', error);
+  englishContent = '<p>Content not available</p>';
+  chineseContent = '<p>内容不可用</p>';
+}
+
+// 页面元数据 - 确保安全访问属性
+const pageTitle = `${typedProject?.title || 'Project'} | Wannz`;
+const pageDescription = typedProject?.description || 'Project details';
+const pageImage = typedProject?.imageUrl || '/images/og-image.jpg';
+const chinesePageTitle = `${typedProject?.chineseTitle || '项目'} | Wannz`;
+const chinesePageDescription = typedProject?.chineseDescription || '项目详情';
+
+// 其他项目属性的安全访问
+const projectTags = typedProject?.tags || [];
+const projectCategory = typedProject?.category || 'other';
+const projectStatus = typedProject?.status || 'completed';
+const projectChineseStatus = typedProject?.chineseStatus || '已完成';
+const projectYear = typedProject?.year || new Date().getFullYear().toString();
+const projectDuration = typedProject?.duration || 'N/A';
+const projectChineseDuration = typedProject?.chineseDuration || '未知';
+const projectGithubUrl = typedProject?.githubUrl || '';
+const projectLiveUrl = typedProject?.liveUrl || '';
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+  image={pageImage}
+  chineseTitle={chinesePageTitle}
+  chineseDescription={chinesePageDescription}
+>
+  <section class="pt-32 pb-20 px-4">
+    <div class="container mx-auto">
+      <!-- 返回按钮 -->
+      <a href="/projects" class="inline-flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors mb-8 group animate-fade-up">
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+        <span class="content-en" data-language="en" data-i18n-key="project.details.backToProjects">Back to Projects</span>
+        <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.backToProjects">返回项目列表</span>
+      </a>
+      
+      <!-- 项目信息区域：左侧标题、描述、标签、链接，右侧项目背景卡片 -->
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-8">
+        <!-- 左侧信息区域 -->
+        <div class="lg:col-span-3 space-y-6 animate-fade-up">
+          <!-- 项目标题 -->
+          <h1 class="h1">
+            <span class="content-en" data-language="en">{typedProject?.title || 'Project'}</span>
+            <span class="content-zh hidden" data-language="zh">{typedProject?.chineseTitle || '项目'}</span>
+          </h1>
+          
+          <!-- 项目描述 -->
+          <p class="text-lg text-muted-foreground">
+            <span class="content-en" data-language="en">{typedProject?.description || 'Project description'}</span>
+            <span class="content-zh hidden" data-language="zh">{typedProject?.chineseDescription || typedProject?.description || '项目描述'}</span>
+          </p>
+          
+          <!-- 项目标签 -->
+          <div class="flex flex-wrap gap-2 animate-fade-up animate-delay-100">
+            {(typedProject?.tags || []).map(tag => (
+              <span class="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm">
+                {tag}
+              </span>
+            ))}
+          </div>
+          
+          <!-- 项目链接 -->
+          <div class="flex flex-wrap gap-4 pt-2">
+            {typedProject?.liveUrl && (
+              <a href={typedProject.liveUrl} target="_blank" rel="noopener noreferrer" 
+                 class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+                <span class="content-en" data-language="en" data-i18n-key="project.details.liveDemo">View Live</span>
+                <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.liveDemo">查看网站</span>
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            )}
+            {typedProject?.githubUrl && (
+              <a href={typedProject.githubUrl} target="_blank" rel="noopener noreferrer" 
+                 class="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+                <span class="content-en" data-language="en" data-i18n-key="project.details.sourceCode">Source Code</span>
+                <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.sourceCode">源代码</span>
+                <Github className="h-4 w-4" />
+              </a>
+            )}
+          </div>
+        </div>
+        
+        <!-- 右侧项目背景卡片 -->
+        <div class="lg:col-span-2 animate-fade-up animate-delay-150">
+          <div class="bg-card border border-border rounded-xl p-6 h-full backdrop-blur-sm bg-opacity-50">
+            <h3 class="text-lg font-medium mb-4">
+              <span class="content-en" data-language="en" data-i18n-key="project.details.overview">Project Background</span>
+              <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.overview">项目背景</span>
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <!-- 状态 -->
+              {typedProject?.status && (
+                <div>
+                  <h4 class="text-sm text-muted-foreground mb-1">
+                    <span class="content-en" data-language="en" data-i18n-key="project.details.status">Status</span>
+                    <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.status">状态</span>
+                  </h4>
+                  <p class="font-medium">
+                    <span class="content-en" data-language="en">
+                      {typedProject.status === 'completed' ? 'Completed' : 
+                       typedProject.status === 'in-progress' ? 'In Progress' : 
+                       typedProject.status === 'discontinued' ? 'Discontinued' : 'Ongoing'}
+                    </span>
+                    <span class="content-zh hidden" data-language="zh">
+                      {typedProject?.chineseStatus || 
+                       (typedProject.status === 'completed' ? '已完成' : 
+                        typedProject.status === 'in-progress' ? '进行中' : 
+                        typedProject.status === 'discontinued' ? '已下线' : '持续更新')}
+                    </span>
+                  </p>
+                </div>
+              )}
+              
+              <!-- 年份 -->
+              {typedProject?.year && (
+                <div>
+                  <h4 class="text-sm text-muted-foreground mb-1">
+                    <span class="content-en" data-language="en" data-i18n-key="project.details.year">Year</span>
+                    <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.year">年份</span>
+                  </h4>
+                  <p class="font-medium">{typedProject.year}</p>
+                </div>
+              )}
+              
+              <!-- 时长 -->
+              {typedProject?.duration && (
+                <div>
+                  <h4 class="text-sm text-muted-foreground mb-1">
+                    <span class="content-en" data-language="en" data-i18n-key="project.details.duration">Duration</span>
+                    <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.duration">持续时间</span>
+                  </h4>
+                  <p class="font-medium">
+                    <span class="content-en" data-language="en">{typedProject.duration}</span>
+                    <span class="content-zh hidden" data-language="zh">{typedProject?.chineseDuration || typedProject.duration}</span>
+                  </p>
+                </div>
+              )}
+              
+              <!-- 分类 -->
+              {typedProject?.category && (
+                <div>
+                  <h4 class="text-sm text-muted-foreground mb-1">
+                    <span class="content-en" data-language="en" data-i18n-key="projects.filter.category">Category</span>
+                    <span class="content-zh hidden" data-language="zh" data-i18n-key="projects.filter.category">分类</span>
+                  </h4>
+                  <p class="font-medium">
+                    <span class="content-en" data-language="en">
+                      {typedProject?.categoryLabel || 
+                       (typedProject.category === 'web' ? 'Web Application' : 
+                        typedProject.category === 'app' ? 'Mobile Application' : 
+                        typedProject.category === 'design' ? 'Design System' : 
+                        typedProject.category === 'tool' ? 'Development Tool' : typedProject.category)}
+                    </span>
+                    <span class="content-zh hidden" data-language="zh">
+                      {typedProject?.chineseCategoryLabel || 
+                       (typedProject.category === 'web' ? '网页应用' : 
+                        typedProject.category === 'app' ? '移动应用' : 
+                        typedProject.category === 'design' ? '设计系统' : 
+                        typedProject.category === 'tool' ? '开发工具' : typedProject.category)}
+                    </span>
+                  </p>
+                </div>
+              )}
+              
+              <!-- 客户 -->
+              {typedProject?.client && (
+                <div>
+                  <h4 class="text-sm text-muted-foreground mb-1">
+                    <span class="content-en" data-language="en" data-i18n-key="project.details.client">Company</span>
+                    <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.client">公司</span>
+                  </h4>
+                  <p class="font-medium">
+                    <span class="content-en" data-language="en">{typedProject.client}</span>
+                    <span class="content-zh hidden" data-language="zh">{typedProject?.chineseClient || typedProject.client}</span>
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <!-- 团队成员 -->
+            {typedProject?.team && Array.isArray(typedProject.team) && typedProject.team.length > 0 && (
+              <div class="mt-6 pt-4 border-t border-border">
+                <h4 class="text-sm text-muted-foreground mb-3">
+                  <span class="content-en" data-language="en" data-i18n-key="project.details.role">My Role</span>
+                  <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.role">我的角色</span>
+                </h4>
+                <div class="flex flex-wrap gap-3">
+                  {typedProject.team.map((member: {name: string; role: string; chineseRole?: string}) => (
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-secondary/50 rounded-lg text-sm">
+                      <span>{member?.name || 'Team Member'}</span>
+                      <span class="text-xs text-muted-foreground">
+                        <span class="content-en" data-language="en">{member?.role || 'Developer'}</span>
+                        <span class="content-zh hidden" data-language="zh">{member?.chineseRole || member?.role || '开发者'}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      <!-- 项目图片 -->
+      <div class="relative overflow-hidden rounded-lg aspect-video bg-card border border-border mb-12 animate-fade-up animate-delay-200">
+        <img 
+          src={String(typedProject?.imageUrl || '/images/og-image.jpg')} 
+          alt={String(typedProject?.title || 'Project image')} 
+          class="w-full h-full object-cover"
+        />
+      </div>
+      
+      <!-- 项目描述 -->
+<!-- 项目描述 -->
+<div class="prose prose-lg dark:prose-invert max-w-none mb-12 animate-fade-up animate-delay-300">
+  <p class="lead text-xl text-muted-foreground">
+    <span class="content-en" data-language="en">{typedProject?.description || 'Project description'}</span>
+    <span class="content-zh hidden" data-language="zh">{typedProject?.chineseDescription || typedProject?.description || '项目描述'}</span>
+  </p>
+  
+  <!-- 英文内容 -->
+  <div class="content-en" data-language="en">
+    <Fragment set:html={englishContent} />
+  </div>
+  
+  <!-- 中文内容 -->
+  <div class="content-zh hidden" data-language="zh">
+    <Fragment set:html={chineseContent} />
+  </div>
+</div>
+      
+      <!-- 项目链接 -->
+      <div class="flex flex-wrap gap-4 animate-fade-up animate-delay-400">
+        {typedProject?.githubUrl && (
+          <a 
+            href={String(typedProject.githubUrl)} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-md transition-colors"
+          >
+            <Github className="h-5 w-5" />
+            <span class="content-en" data-language="en" data-i18n-key="projects.viewOnGithub">View on GitHub</span>
+            <span class="content-zh hidden" data-language="zh" data-i18n-key="projects.viewOnGithub">在GitHub上查看</span>
+          </a>
+        )}
+        {typedProject?.liveUrl && (
+          <a 
+            href={String(typedProject.liveUrl)} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors"
+          >
+            <span class="content-en" data-language="en" data-i18n-key="projects.viewLiveDemo">View Live Demo</span>
+            <span class="content-zh hidden" data-language="zh" data-i18n-key="projects.viewLiveDemo">查看在线演示</span>
+            <ArrowUpRight className="h-5 w-5" />
+          </a>
+        )}
+      </div>
+      
+      <!-- 返回所有项目按钮 -->
+      <div class="mt-12 animate-fade-up animate-delay-500">
+        <a 
+          href="/projects" 
+          class="inline-flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-md transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span class="content-en" data-language="en" data-i18n-key="project.details.backToProjects">Back to all projects</span>
+          <span class="content-zh hidden" data-language="zh" data-i18n-key="project.details.backToProjects">返回所有项目</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<script>
+  // 使用优化的国际化客户端脚本
+  import { initI18n } from '../../scripts/i18n-client';
+  document.addEventListener('DOMContentLoaded', () => {
+    initI18n();
+  });
+  
+  // 配置 marked 以正确处理图片
+  marked.use({
+    renderer: {
+      image(href, title, text) {
+        return `<img src="${href}" alt="${text || ''}" title="${title || ''}" class="rounded-lg my-4 max-w-full" />`;
+      }
+    }
+  });
+</script>

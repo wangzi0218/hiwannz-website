@@ -1,0 +1,158 @@
+---
+import { Menu, X } from 'lucide-astro';
+import LanguageSwitcherWithProviderWrapper from './LanguageSwitcherWithProviderWrapper.astro';
+
+// 导航链接
+const navLinks = [
+  { name: 'Home', path: '/', key: 'nav.home' },
+  { name: 'About', path: '/about', key: 'nav.about' },
+  { name: 'Projects', path: '/projects', key: 'nav.projects' },
+  { name: 'Insights', path: '/insights', key: 'nav.insights' },
+  { name: 'Contact', path: '/contact', key: 'nav.contact' }
+];
+
+// 获取当前路径，用于高亮当前页面
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  id="navbar"
+  class="fixed top-0 left-0 w-full z-50 transition-all duration-300 py-5 bg-transparent"
+>
+  <div class="container mx-auto px-4 flex justify-between items-center">
+    <!-- Logo -->
+    <a 
+      href="/" 
+      class="text-xl font-bold tracking-tight relative group"
+    >
+      <span class="relative inline-block font-caveat text-2xl font-semibold transition-transform duration-300 ease-out-expo group-hover:scale-110 origin-left">
+        Hiwannz
+      </span>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex items-center">
+      <div class="flex items-center space-x-8">
+        {navLinks.map((link) => (
+          <a
+            href={link.path}
+            class:list={[
+              "relative group text-sm font-medium",
+              { "text-primary": currentPath === link.path }
+            ]}
+          >
+            <span class="relative inline-block">
+              {link.name}
+              <span class:list={[
+                "absolute -bottom-1 left-0 w-full h-0.5 bg-primary transform origin-left transition-all duration-300 ease-out-expo",
+                currentPath === link.path ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+              ]}></span>
+            </span>
+          </a>
+        ))}
+      </div>
+      
+      <!-- Language Toggle -->
+      <div class="ml-8 pl-8 border-l border-border">
+        <LanguageSwitcherWithProviderWrapper />
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Toggle and Language Switcher -->
+    <div class="md:hidden flex items-center gap-4">
+      <div class="mr-2">
+        <LanguageSwitcherWithProviderWrapper />
+      </div>
+      
+      <button 
+        id="mobile-menu-toggle"
+        class="text-primary focus:outline-none"
+        aria-label="Toggle menu"
+      >
+        <Menu size={24} id="menu-icon" />
+        <X size={24} id="close-icon" class="hidden" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div
+    id="mobile-menu"
+    class="fixed inset-0 bg-background/95 backdrop-blur-lg z-40 flex flex-col items-center justify-center transition-all duration-500 ease-out-expo opacity-0 pointer-events-none"
+  >
+    <nav class="flex flex-col items-center space-y-8">
+      {navLinks.map((link, index) => (
+        <a
+          href={link.path}
+          class="text-2xl font-medium animate-fade-up"
+          style={`animation-delay: ${index * 100}ms`}
+          data-mobile-link
+        >
+          {link.name}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<script>
+  // 处理滚动效果
+  function handleScroll() {
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 20) {
+      navbar?.classList.remove('py-5', 'bg-transparent');
+      navbar?.classList.add('py-3', 'glass');
+    } else {
+      navbar?.classList.remove('py-3', 'glass');
+      navbar?.classList.add('py-5', 'bg-transparent');
+    }
+  }
+
+  // 处理移动菜单
+  function setupMobileMenu() {
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const mobileLinks = document.querySelectorAll('[data-mobile-link]');
+
+    let isOpen = false;
+
+    function toggleMenu() {
+      isOpen = !isOpen;
+      
+      if (isOpen) {
+        mobileMenu?.classList.remove('opacity-0', 'pointer-events-none');
+        mobileMenu?.classList.add('opacity-100', 'pointer-events-auto');
+        menuIcon?.classList.add('hidden');
+        closeIcon?.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      } else {
+        mobileMenu?.classList.remove('opacity-100', 'pointer-events-auto');
+        mobileMenu?.classList.add('opacity-0', 'pointer-events-none');
+        menuIcon?.classList.remove('hidden');
+        closeIcon?.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    }
+
+    mobileMenuToggle?.addEventListener('click', toggleMenu);
+    
+    // 点击链接后关闭菜单
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (isOpen) toggleMenu();
+      });
+    });
+  }
+
+  // 注意：语言切换功能现在由 LanguageContext 组件处理
+
+  // 初始化
+  window.addEventListener('scroll', handleScroll);
+  document.addEventListener('DOMContentLoaded', () => {
+    handleScroll(); // 初始检查
+    setupMobileMenu();
+    // 语言切换现在由 React 组件处理
+  });
+</script>

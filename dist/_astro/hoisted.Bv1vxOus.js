@@ -1,0 +1,1 @@
+import{i,u as o}from"./i18n-client._cUWEELK.js";import"./Navbar.astro_astro_type_script_index_0_lang.03Xj5Fc1.js";let e=!1,t=!1;async function a(){try{await i(),t=!0,d()}catch(n){console.error("Failed to initialize i18n:",n)}}function d(){e&&t&&o()}typeof window<"u"&&window.addEventListener("DOMContentLoaded",()=>{e=!0,a()});

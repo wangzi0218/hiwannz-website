@@ -1,0 +1,341 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { ArrowRight, Lightbulb, Users, Zap, Clock, Heart, Search, Compass, Target } from 'lucide-react';
+import Hero from '../components/Hero.astro';
+import ContactCTA from '../components/ContactCTA.astro';
+import { getCollection } from 'astro:content';
+
+// 页面元数据
+const pageTitle = "Wannz | Developer & Designer";
+const pageDescription = "Personal portfolio of Wannz, a developer and designer passionate about creating intuitive, accessible, and beautiful digital experiences.";
+const pageImage = "/images/og-image.jpg"; // 社交媒体分享图片
+
+// 定义项目类型
+interface Project {
+  id: string;
+  title: string;
+  chineseTitle: string;
+  description: string;
+  chineseDescription: string;
+  tags: string[];
+  imageUrl: string;
+  liveUrl: string;
+  githubUrl: string;
+  slug: string;
+}
+
+// 从 content/projects 目录中获取项目数据
+let featuredProjects: Project[] = [];
+try {
+  // 获取所有项目条目
+  const projectEntries = await getCollection('projects');
+  
+  // 按日期降序排序（最新的先显示）
+  const sortedEntries = projectEntries.sort((a, b) => {
+    return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
+  });
+  
+  // 只获取前三个项目（或者所有项目，如果少于三个）
+  const limitedEntries = sortedEntries.slice(0, 3);
+  
+  // 映射数据到项目对象
+  featuredProjects = limitedEntries.map(entry => ({
+    id: entry.data.id,
+    title: entry.data.title,
+    chineseTitle: entry.data.chineseTitle || entry.data.title,
+    description: entry.data.description,
+    chineseDescription: entry.data.chineseDescription || entry.data.description,
+    tags: entry.data.tags,
+    imageUrl: entry.data.imageUrl,
+    liveUrl: entry.data.liveUrl || `#`,
+    githubUrl: entry.data.githubUrl || `#`,
+    slug: entry.data.id // 使用 ID 作为 slug
+  }));
+  
+  console.log(`首页成功加载 ${featuredProjects.length} 个最新项目`);
+} catch (error) {
+  console.error('从 content/projects 加载项目时出错:', error);
+  // 如果加载失败，使用空数组
+  featuredProjects = [];
+}
+
+// 从 content/insights 目录中获取洞察文章数据
+let recentPosts = [];
+try {
+  // 获取所有洞察文章条目
+  const insightEntries = await getCollection('insights');
+  
+  // 按日期降序排序（最新的先显示）
+  const sortedEntries = insightEntries.sort((a, b) => {
+    return new Date(b.data.date || '2023-01-01').getTime() - new Date(a.data.date || '2023-01-01').getTime();
+  });
+  
+  // 只获取前两个文章（或者所有文章，如果少于两个）
+  const limitedEntries = sortedEntries.slice(0, 2);
+  
+  // 映射数据到文章对象
+  recentPosts = limitedEntries.map(entry => ({
+    id: entry.data.id,
+    title: entry.data.title,
+    chineseTitle: entry.data.chineseTitle || entry.data.title,
+    excerpt: entry.data.excerpt,
+    chineseExcerpt: entry.data.chineseExcerpt || entry.data.excerpt,
+    date: entry.data.date ? new Date(entry.data.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+    slug: entry.slug || entry.data.id,
+    timeToRead: entry.data.timeToRead || '5 min read'
+  }));
+  
+  console.log(`首页成功加载 ${recentPosts.length} 篇最新洞察文章`);
+} catch (error) {
+  console.error('从 content/insights 加载洞察文章时出错:', error);
+  // 如果加载失败，使用空数组
+  recentPosts = [];
+}
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+  image={pageImage}
+>
+  <Hero />
+  
+  {/* 产品设计价值观部分 */}
+  <section class="py-20 px-4 bg-secondary/30">
+    <div class="container mx-auto">
+      <div class="mb-12">
+        <h2 class="h2 mb-4 animate-fade-up" data-i18n-key="home.productValues">Product Design Values</h2>
+        <p class="text-muted-foreground max-w-4xl animate-fade-up animate-delay-100" data-i18n-key="home.productValuesDesc">
+          These core values guide my approach to product design and development, ensuring I create solutions that are both user-friendly and technically sound.
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+        <div class="flex flex-col items-center text-center p-6 rounded-lg border border-border animate-fade-up" style="animation-delay: 0ms;">
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+            <Compass size={24} />
+          </div>
+          <h3 class="text-xl font-bold mb-2" data-i18n-key="home.stayTrue">Stay True</h3>
+          <p class="text-muted-foreground" data-i18n-key="home.stayTrueDesc">Always remember the original purpose of the product, dare to admit problems and make decisive improvements.</p>
+        </div>
+        
+        <div class="flex flex-col items-center text-center p-6 rounded-lg border border-border animate-fade-up" style="animation-delay: 100ms;">
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+            <Search size={24} />
+          </div>
+          <h3 class="text-xl font-bold mb-2" data-i18n-key="home.rootCause">Root Cause</h3>
+          <p class="text-muted-foreground" data-i18n-key="home.rootCauseDesc">Carefully explore the essence of problems, avoid doing just superficial work.</p>
+        </div>
+        
+        <div class="flex flex-col items-center text-center p-6 rounded-lg border border-border animate-fade-up" style="animation-delay: 200ms;">
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+            <Zap size={24} />
+          </div>
+          <h3 class="text-xl font-bold mb-2" data-i18n-key="home.simplicity">Simplicity</h3>
+          <p class="text-muted-foreground" data-i18n-key="home.simplicityDesc">Simplicity above all, rejecting unnecessary embellishment. Intuitive design is good design.</p>
+        </div>
+        
+        <div class="flex flex-col items-center text-center p-6 rounded-lg border border-border animate-fade-up" style="animation-delay: 300ms;">
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+            <Heart size={24} />
+          </div>
+          <h3 class="text-xl font-bold mb-2" data-i18n-key="home.humanCentric">Human-Centric</h3>
+          <p class="text-muted-foreground" data-i18n-key="home.humanCentricDesc">Focus on user experience, with long-term value as the core orientation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  {/* 精选项目部分 */}
+  <section class="py-20 px-4">
+    <div class="container mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-baseline mb-12">
+        <div>
+          <h2 class="h2 mb-4" data-i18n-key="home.featuredProjects">Featured Projects</h2>
+          <p class="text-muted-foreground max-w-2xl" data-i18n-key="home.projectsDesc">
+            A selection of my recent work, showcasing my skills in design and development.
+          </p>
+        </div>
+        <a 
+          href="/projects" 
+          class="mt-4 md:mt-0 flex items-center gap-1 group text-primary font-medium"
+        >
+          <span data-i18n-key="home.viewAllProjects">View all projects</span>
+          <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+        </a>
+      </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featuredProjects.length > 0 ? (
+          featuredProjects.map((project, idx) => (
+            <a 
+              href={`/projects/${project.id}`} 
+              class="group relative block rounded-lg overflow-hidden h-[350px] transition-all hover:shadow-md project-card" 
+              style={`animation-delay: ${idx * 100}ms;`}
+              data-project-id={project.id}
+            >
+              {/* 图片与渐变遮罩 */}
+              <div class="absolute inset-0 w-full h-full">
+                <img 
+                  src={project.imageUrl} 
+                  alt={project.title} 
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-opacity duration-500 group-hover:opacity-90"></div>
+              </div>
+              
+              {/* 内容区域 */}
+              <div class="absolute inset-0 w-full h-full p-6 flex flex-col justify-end text-white">
+                {/* 标签区域 - 在顶部，hover 时上移 */}
+                <div class="flex flex-wrap gap-2 mb-4 transition-all duration-500 group-hover:-translate-y-2 group-hover:opacity-100 opacity-90">
+                  {project.tags && project.tags.map((tag: string) => (
+                    <span class="text-xs py-1 px-2 rounded-full bg-white/10 backdrop-blur-sm">{tag}</span>
+                  ))}
+                </div>
+                
+                {/* 标题 - 在标签下方，hover 时上移 */}
+                <h3 class="text-xl font-bold mb-2 transition-transform duration-500 group-hover:-translate-y-2 project-title" data-en={project.title} data-zh={project.chineseTitle}>
+                  {project.title}
+                </h3>
+                
+                {/* 描述 - 在标题下方，只在 hover 时显示 */}
+                <p class="text-sm text-white/90 transition-all duration-300 group-hover:opacity-100 group-hover:max-h-20 group-hover:mb-4 opacity-0 max-h-0 overflow-hidden mb-0 project-description" data-en={project.description} data-zh={project.chineseDescription}>
+                  {project.description}
+                </p>
+              </div>
+            </a>
+          ))
+        ) : (
+          <div class="col-span-3 text-center py-12">
+            <p class="text-muted-foreground" data-i18n-key="home.noProjects">No projects found. Check back soon!</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+  
+  {/* 最新设计洞察部分 */}
+  <section class="py-20 px-4 bg-secondary/30">
+    <div class="container mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-baseline mb-12">
+        <div>
+          <h2 class="h2 mb-4" data-i18n-key="home.recentPosts">Recent Insights</h2>
+          <p class="text-muted-foreground max-w-2xl" data-i18n-key="home.postsDesc">
+            Thoughts, ideas, and insights on design, development, and the digital world.
+          </p>
+        </div>
+        <a 
+          href="/insights" 
+          class="mt-4 md:mt-0 flex items-center gap-1 group text-primary font-medium"
+        >
+          <span data-i18n-key="home.viewAllPosts">View all insights</span>
+          <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+        </a>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        {recentPosts.map((post, idx) => (
+          <a 
+            href={`/insights/${post.slug}`} 
+            class="group p-6 border border-border rounded-lg transition-all hover:shadow-md blog-post-card"
+            style={`animation-delay: ${idx * 100}ms;`}
+            data-post-id={post.id}
+          >
+            <div class="flex flex-col">
+              <span class="text-sm text-muted-foreground mb-2 post-date">{post.date} · {post.timeToRead}</span>
+              <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors post-title" data-en={post.title} data-zh={post.chineseTitle || post.title}>{post.title}</h3>
+              <p class="text-muted-foreground post-excerpt" data-en={post.excerpt} data-zh={post.chineseExcerpt || post.excerpt}>{post.excerpt}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+  
+  {/* 联系 CTA 部分 */}
+  <ContactCTA />
+</MainLayout>
+
+<script>
+  // 使用优化的国际化客户端脚本
+  import { initI18n, updatePageContent } from '../scripts/i18n-client';
+  import { getCurrentLanguage, translateSync } from '../scripts/i18n-client';
+  
+  // 初始化国际化
+  document.addEventListener('DOMContentLoaded', () => {
+    initI18n().then(() => {
+      // 翻译加载完成后更新页面内容
+      updatePageContent();
+      updateBlogPostsContent();
+      updateProjectCardsContent();
+    });
+  });
+  
+  // 监听语言变化事件
+  document.addEventListener('languageChanged', () => {
+    updatePageContent();
+    updateBlogPostsContent();
+    updateProjectCardsContent();
+  });
+
+  // 更新博客文章内容
+  function updateBlogPostsContent() {
+    // 获取当前语言
+    const currentLang = getCurrentLanguage();
+    
+    // 选择所有博客文章卡片
+    document.querySelectorAll('.blog-post-card').forEach(card => {
+      // 更新标题
+      const titleElement = card.querySelector('.post-title');
+      if (titleElement) {
+        // 直接从 data 属性获取对应语言的内容
+        const content = currentLang === 'zh' ? titleElement.getAttribute('data-zh') : titleElement.getAttribute('data-en');
+        if (content) titleElement.textContent = content;
+      }
+      
+      // 更新摘要
+      const excerptElement = card.querySelector('.post-excerpt');
+      if (excerptElement) {
+        // 直接从 data 属性获取对应语言的内容
+        const content = currentLang === 'zh' ? excerptElement.getAttribute('data-zh') : excerptElement.getAttribute('data-en');
+        if (content) excerptElement.textContent = content;
+      }
+    });
+  }
+
+  // 更新项目卡片内容
+  function updateProjectCardsContent() {
+    // 获取当前语言
+    const currentLang = getCurrentLanguage();
+    
+    // 选择所有项目卡片
+    document.querySelectorAll('.project-card').forEach(card => {
+      // 更新标题
+      const titleElement = card.querySelector('.project-title');
+      if (titleElement) {
+        // 直接从 data 属性获取对应语言的内容
+        const content = currentLang === 'zh' ? titleElement.getAttribute('data-zh') : titleElement.getAttribute('data-en');
+        if (content) titleElement.textContent = content;
+      }
+      
+      // 更新描述
+      const descriptionElement = card.querySelector('.project-description');
+      if (descriptionElement) {
+        // 直接从 data 属性获取对应语言的内容
+        const content = currentLang === 'zh' ? descriptionElement.getAttribute('data-zh') : descriptionElement.getAttribute('data-en');
+        if (content) descriptionElement.textContent = content;
+      }
+
+      // 更新按钮文本
+      const liveDemo = card.querySelector('[data-i18n-key="projects.viewLiveDemo"]');
+      if (liveDemo) {
+        liveDemo.textContent = translateSync('projects.viewLiveDemo', currentLang);
+      }
+
+      const github = card.querySelector('[data-i18n-key="projects.viewOnGithub"]');
+      if (github) {
+        github.textContent = translateSync('project.github', currentLang);
+      }
+    });
+  }
+</script>

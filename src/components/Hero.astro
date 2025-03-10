@@ -1,0 +1,182 @@
+---
+import { ArrowDown, Code, Heart, Lightbulb, Star, Zap, Target } from 'lucide-astro';
+---
+
+<section class="min-h-screen flex flex-col justify-center pt-20 pb-10 px-4 relative overflow-hidden">
+  <!-- 背景装饰元素 -->
+  <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+  <div class="absolute top-1/3 -left-20 w-72 h-72 bg-secondary/5 rounded-full blur-3xl"></div>
+  
+  <!-- Sticker 装饰元素 -->
+  <div class="absolute top-32 right-[15%] animate-float-slow opacity-70">
+    <Star class="h-6 w-6 text-primary rotate-12" />
+  </div>
+  <div class="absolute bottom-32 left-[10%] animate-float opacity-70">
+    <Zap class="h-5 w-5 text-primary rotate-12" />
+  </div>
+  <div class="absolute top-[40%] right-[5%] animate-float-slow-reverse opacity-70">
+    <Target class="h-7 w-7 text-secondary/70 -rotate-12" />
+  </div>
+  
+  <!-- 点状装饰 -->
+  <div class="absolute top-40 left-[20%] w-2 h-2 rounded-full bg-primary/40 animate-pulse"></div>
+  <div class="absolute bottom-40 right-[25%] w-1.5 h-1.5 rounded-full bg-secondary/40 animate-pulse"></div>
+  <div class="absolute top-[60%] left-[8%] w-1 h-1 rounded-full bg-primary/30 animate-pulse"></div>
+  
+  <div class="container mx-auto">
+    <div class="max-w-4xl">
+      <p class="text-sm font-medium text-primary mb-4 tracking-wider animate-fade-up" data-i18n-key="hero.greeting">嗨，我是</p>
+      
+      <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+        <span class="block animate-fade-up animate-delay-100" data-i18n-key="hero.name">Wannz</span>
+        <span class="block text-4xl md:text-5xl lg:text-6xl text-muted-foreground mt-2 animate-fade-up animate-delay-200">
+          <span class="inline-block" data-i18n-key="hero.title">Product Manager</span>
+          <span class="inline-block animate-wave origin-bottom-right ml-2" data-i18n-key="hero.emoji">👋</span>
+        </span>
+      </h1>
+      
+      <div class="text-lg md:text-xl text-muted-foreground max-w-2xl mb-6 animate-fade-up animate-delay-300" id="hero-description">
+        <!-- 这里将由客户端脚本填充 -->
+        <p data-i18n-key="hero.description" class="hidden"></p>
+      </div>
+      
+      <!-- 特质标签 -->
+      <div class="flex flex-wrap gap-3 mb-10 animate-fade-up animate-delay-400">
+        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/10 rounded-full text-sm hover:bg-secondary/20 transition-colors">
+          <Heart class="h-4 w-4 text-primary" />
+          <span data-i18n-key="hero.trait.empathy">User Empathy</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/10 rounded-full text-sm hover:bg-secondary/20 transition-colors">
+          <Lightbulb class="h-4 w-4 text-primary" />
+          <span data-i18n-key="hero.trait.innovation">Innovative Thinking</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/10 rounded-full text-sm hover:bg-secondary/20 transition-colors">
+          <Code class="h-4 w-4 text-primary" />
+          <span data-i18n-key="hero.trait.technical">Technical Insight</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/10 rounded-full text-sm hover:bg-secondary/20 transition-colors">
+          <Target class="h-4 w-4 text-primary" />
+          <span data-i18n-key="hero.trait.focus">Goal Oriented</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/10 rounded-full text-sm hover:bg-secondary/20 transition-colors">
+          <Zap class="h-4 w-4 text-primary" />
+          <span data-i18n-key="hero.trait.execution">Efficient Execution</span>
+        </div>
+      </div>
+      
+      <div class="flex flex-col sm:flex-row gap-4 animate-fade-up animate-delay-500">
+        <a 
+          href="/projects" 
+          class="px-6 py-3 bg-primary text-primary-foreground rounded-md font-medium transition-all hover:opacity-90 hover:translate-y-[-2px]"
+          data-i18n-key="hero.cta.work"
+        >
+          查看我的作品
+        </a>
+        <a 
+          href="/contact" 
+          class="px-6 py-3 bg-secondary/10 text-foreground rounded-md font-medium transition-all hover:bg-secondary/20 hover:translate-y-[-2px]"
+          data-i18n-key="hero.cta.contact"
+        >
+          联系我
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <div 
+    id="scroll-indicator"
+    class="absolute bottom-10 left-0 right-0 mx-auto w-full flex flex-col items-center justify-center text-center transition-opacity duration-500 animate-fade-up animate-delay-700 z-10"
+  >
+    <span class="text-sm text-muted-foreground mb-2 animate-pulse" data-i18n-key="hero.scroll">向下滚动探索更多</span>
+    <ArrowDown class="animate-bounce h-5 w-5 text-primary" />
+  </div>
+</section>
+
+<script>
+  // 处理滚动指示器的显示/隐藏
+  function handleScrollIndicator() {
+    const scrollIndicator = document.getElementById('scroll-indicator');
+    const heroSection = document.querySelector('section');
+    
+    function updateOpacity() {
+      if (scrollIndicator) {
+        if (window.scrollY > 100) {
+          scrollIndicator.style.opacity = '0';
+          scrollIndicator.style.pointerEvents = 'none';
+        } else {
+          scrollIndicator.style.opacity = '1';
+          scrollIndicator.style.pointerEvents = 'auto';
+        }
+      }
+    }
+
+    window.addEventListener('scroll', updateOpacity);
+    
+    // 初始检查
+    updateOpacity();
+    
+    // 点击滚动指示器时平滑滚动到下一部分
+    if (scrollIndicator) {
+      scrollIndicator.addEventListener('click', () => {
+        const nextSection = heroSection.nextElementSibling;
+        if (nextSection) {
+          nextSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.scrollTo({
+            top: window.innerHeight,
+            behavior: 'smooth'
+          });
+        }
+      });
+    }
+  }
+
+  // 处理高亮文本
+  function formatHighlightedDescription() {
+    // 导入 i18n 客户端脚本
+    import('../scripts/i18n-client').then(({ getCurrentLanguage, translateSync, isTranslationsLoaded }) => {
+      // 确保翻译已加载
+      if (!isTranslationsLoaded()) {
+        setTimeout(formatHighlightedDescription, 100);
+        return;
+      }
+
+      const lang = getCurrentLanguage();
+      const descriptionContainer = document.getElementById('hero-description');
+      
+      if (!descriptionContainer) return;
+      
+      // 获取基本描述文本和高亮词
+      const descriptionTemplate = translateSync('hero.description', lang);
+      const highlights = [
+        translateSync('hero.highlight.passionate', lang),
+        translateSync('hero.highlight.empathy', lang),
+        translateSync('hero.highlight.userNeeds', lang),
+        translateSync('hero.highlight.technicalImpl', lang),
+        translateSync('hero.highlight.deepInsights', lang),
+        translateSync('hero.highlight.innovativeSolutions', lang)
+      ];
+      
+      // 替换模板中的占位符为高亮文本
+      let formattedText = descriptionTemplate;
+      highlights.forEach((highlight, index) => {
+        const highlightHtml = `<span class="text-primary font-medium">${highlight}</span>`;
+        formattedText = formattedText.replace(`{${index}}`, highlightHtml);
+      });
+      
+      // 更新DOM
+      descriptionContainer.innerHTML = formattedText;
+    }).catch(error => {
+      console.error('Error loading i18n client:', error);
+    });
+  }
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    handleScrollIndicator();
+    formatHighlightedDescription();
+  });
+  
+  // 当语言切换时重新格式化高亮文本
+  document.addEventListener('languageChanged', formatHighlightedDescription);
+</script>

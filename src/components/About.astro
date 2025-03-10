@@ -1,0 +1,104 @@
+---
+// 技能列表
+const skills = [
+  { category: "Frontend", key: "about.skills.frontend", items: ["HTML/CSS", "JavaScript", "TypeScript", "React", "Vue", "Astro", "Next.js", "TailwindCSS"] },
+  { category: "Backend", key: "about.skills.backend", items: ["Node.js", "Express", "Python", "Django", "PostgreSQL", "MongoDB"] },
+  { category: "Design", key: "about.skills.design", items: ["Figma", "Adobe XD", "UI/UX", "Design Systems", "Prototyping"] },
+  { category: "Tools", key: "about.skills.tools", items: ["Git", "Docker", "CI/CD", "AWS", "Vercel", "Netlify"] }
+];
+
+// 经历项目
+const experiences = [
+  {
+    title: "Senior Frontend Developer",
+    titleKey: "about.experience.job1.title",
+    company: "Tech Company",
+    companyKey: "about.experience.job1.company",
+    period: "2021 - Present",
+    periodKey: "about.experience.job1.period",
+    description: "Leading frontend development for enterprise applications, implementing design systems, and optimizing performance.",
+    descriptionKey: "about.experience.job1.description"
+  },
+  {
+    title: "UI/UX Designer & Developer",
+    titleKey: "about.experience.job2.title",
+    company: "Design Studio",
+    companyKey: "about.experience.job2.company",
+    period: "2018 - 2021",
+    periodKey: "about.experience.job2.period",
+    description: "Created user interfaces and experiences for web and mobile applications, collaborating with clients to deliver intuitive designs.",
+    descriptionKey: "about.experience.job2.description"
+  },
+  {
+    title: "Web Developer",
+    titleKey: "about.experience.job3.title",
+    company: "Digital Agency",
+    companyKey: "about.experience.job3.company",
+    period: "2016 - 2018",
+    periodKey: "about.experience.job3.period",
+    description: "Developed responsive websites and web applications for various clients, focusing on performance and accessibility.",
+    descriptionKey: "about.experience.job3.description"
+  }
+];
+---
+
+<section id="about" class="py-20">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="h2 mb-8" data-i18n-key="about.title">About Me</h2>
+      
+      <div class="mb-12 space-y-6 text-muted-foreground">
+        <p data-i18n-key="about.bio.p1">
+          I'm a passionate developer and designer with a focus on creating beautiful, functional, and accessible digital experiences. 
+          With over 5 years of experience in the industry, I've worked on a wide range of projects from small business websites to 
+          large-scale enterprise applications.
+        </p>
+        <p data-i18n-key="about.bio.p2">
+          My approach combines technical expertise with an eye for design, allowing me to bridge the gap between aesthetics and functionality. 
+          I believe in clean code, intuitive interfaces, and thoughtful user experiences that solve real problems.
+        </p>
+        <p data-i18n-key="about.bio.p3">
+          When I'm not coding or designing, you can find me exploring new technologies, contributing to open-source projects, 
+          or enjoying a good book with a cup of coffee.
+        </p>
+      </div>
+      
+      <!-- Skills Section -->
+      <div class="mb-16">
+        <h3 class="h3 mb-6" data-i18n-key="about.skills.title">Skills & Technologies</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {skills.map(skillGroup => (
+            <div class="bg-card rounded-lg p-6 border border-border">
+              <h4 class="text-lg font-medium mb-4" data-i18n-key={skillGroup.key}>{skillGroup.category}</h4>
+              <div class="flex flex-wrap gap-2">
+                {skillGroup.items.map(skill => (
+                  <span class="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <!-- Experience Section -->
+      <div>
+        <h3 class="h3 mb-6" data-i18n-key="about.experience.title">Experience</h3>
+        <div class="space-y-8">
+          {experiences.map(exp => (
+            <div class="group">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+                <h4 class="text-lg font-medium group-hover:text-primary transition-colors">
+                  <span data-i18n-key={exp.titleKey}>{exp.title}</span> · <span class="text-muted-foreground" data-i18n-key={exp.companyKey}>{exp.company}</span>
+                </h4>
+                <span class="text-sm text-muted-foreground" data-i18n-key={exp.periodKey}>{exp.period}</span>
+              </div>
+              <p class="text-muted-foreground" data-i18n-key={exp.descriptionKey}>{exp.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
