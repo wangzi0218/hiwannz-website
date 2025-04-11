@@ -132,7 +132,11 @@ const categories = [
       
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16" id="projects-grid">
         {allProjects.map((project, idx) => (
-          <div data-category={Array.isArray(project.category) ? JSON.stringify(project.category) : project.category} class="project-container animate-fade-up" style={`animation-delay: ${idx * 100}ms;`}>
+          <div 
+            data-category={Array.isArray(project.category) ? JSON.stringify(project.category) : project.category} 
+            class="project-container" 
+            style={`--animation-delay: ${idx * 100};`}
+          >
             <ProjectCard 
               id={project.id}
               title={project.title}

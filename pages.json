@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "name": "hiwannz-minimalist-website",
+  "build": {
+    "command": "npm run build",
+    "output_directory": "dist",
+    "root_directory": "/"
+  },
+  "routes": [
+    {
+      "pattern": "/*",
+      "script": "",
+      "dest": "/index.html",
+      "status": 200,
+      "headers": {
+        "Cache-Control": "public, max-age=3600"
+      },
+      "continue": false
+    }
+  ]
+}

@@ -81,6 +81,7 @@ const finalProjectUrl = projectUrl || `/projects/${String(id)}`;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeIn 0.5s ease-out forwards;
+    animation-delay: calc(var(--animation-delay, 0) * 1ms);
     position: relative;
   }
   

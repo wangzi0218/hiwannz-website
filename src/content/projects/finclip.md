@@ -93,7 +93,7 @@ The practice of FinClip has profoundly taught me that the core value of a produc
 (Note: The data involved in this article has been desensitized or obfuscated, and some technical details have not been disclosed due to confidentiality agreements)
 <div class="content-zh" data-language="zh">
 
-# 《FinClip 企业级小程序容器技术项目总结：产品视角下的生态破局与商业闭环》
+# FinClip 企业级小程序容器技术项目总结：产品视角下的生态破局与商业闭环
 作为 FinClip 产品总监，我主导设计了企业级小程序容器技术平台，通过「产品力 × 生态力 × 商业力」的三维驱动，成功打破微信 / 支付宝小程序的生态垄断，为企业数字化转型提供了「自主可控、敏捷创新」的基础设施。以下是基于产品视角的深度总结：
 
 ## 产品战略定位：企业数字化转型的「操作系统」
